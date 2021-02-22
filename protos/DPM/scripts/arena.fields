@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+my$X=15;
+my$Y=9;
+
+for(my$x=0;$x<$X;$x++){
+ for(my$y=0;$y<$Y;$y++){
+  print "  hiddenField SFColor tileColor_".$x."_".$y." 0.5 0.5 1\n";
+  print "  hiddenField SFFloat tileHeight_".$x."_".$y." 0\n";
+ }
+}
