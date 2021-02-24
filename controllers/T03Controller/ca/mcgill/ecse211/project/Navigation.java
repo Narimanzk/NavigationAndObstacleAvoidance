@@ -51,12 +51,15 @@ public class Navigation {
   
   /** Returns the signed minimal angle in degrees from initial angle to destination angle (deg). */
   public static double minimalAngle(double initialAngle, double destAngle) {
-    return 0; // TODO
+    return (destAngle-initialAngle)%360; // TODO
   }
   
   /** Returns the distance between the two points in tile lengths (feet). */
   public static double distanceBetween(Point p1, Point p2) {
-    return 0; // TODO
+    double dx_squared = Math.pow((p2.x - p1.x), 2);
+    double dy_squared = Math.pow((p2.y - p1.y), 2);
+    double dist = Math.sqrt(dx_squared + dy_squared);
+    return dist;
   }
   
   // TODO Bring Navigation-related helper methods from Labs 2 and 3 here

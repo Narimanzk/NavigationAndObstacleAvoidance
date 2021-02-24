@@ -36,7 +36,7 @@ public class Main {
     var startingPoint = waypoints.get(0);
     odometer.setXyt(startingPoint.x * TILE_SIZE, startingPoint.y * TILE_SIZE, 0);
     new Thread(odometer).start();
-    
+        
     // TODO Localize in the corner like in the previous lab
     UltrasonicLocalizer.localize();
     LightLocalizer.localize();
