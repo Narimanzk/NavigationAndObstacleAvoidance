@@ -19,7 +19,7 @@ import simlejos.robotics.RegulatedMotor;
 public class Resources {
   
   /** The team number. */
-  public static final int TEAM_NUMBER = 0; // TODO
+  public static final int TEAM_NUMBER = 03;
   
   /** The time between physics steps in milliseconds. */
   public static final int PHYSICS_STEP_PERIOD = 500; // ms
