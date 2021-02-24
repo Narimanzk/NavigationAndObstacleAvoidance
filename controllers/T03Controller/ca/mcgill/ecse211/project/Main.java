@@ -38,8 +38,9 @@ public class Main {
     new Thread(odometer).start();
     
     // TODO Localize in the corner like in the previous lab
-    //UltrasonicLocalizer.localize();
-    //LightLocalizer.localize();
+    UltrasonicLocalizer.localize();
+    LightLocalizer.localize();
+    System.out.println("Done localizing");
     
     var remainingWaypoints = waypoints.subList(1, waypoints.size()); // other than starting point
     

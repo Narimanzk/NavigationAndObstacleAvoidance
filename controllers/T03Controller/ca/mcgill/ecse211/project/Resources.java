@@ -7,6 +7,7 @@ import simlejos.hardware.port.SensorPort;
 import simlejos.hardware.sensor.EV3ColorSensor;
 import simlejos.hardware.sensor.EV3UltrasonicSensor;
 import simlejos.robotics.RegulatedMotor;
+import simlejos.robotics.SampleProvider;
 
 /**
  * Class for static resources (things that stay the same throughout the entire program execution),
@@ -42,28 +43,41 @@ public class Resources {
   public static final int MAX_SENSOR_DIST = 255;
   
   /** The limit of invalid samples that we read from the US sensor before assuming no obstacle. */
-  public static final int INVALID_SAMPLE_LIMIT = 0;
+  public static final int INVALID_SAMPLE_LIMIT = 20;
   
   /** The wheel radius in meters. */
   public static final double WHEEL_RAD = 0.021;
   
   /** The robot width in meters. */
-  public static final double BASE_WIDTH = 0;
+  public static final double BASE_WIDTH = 0.158;
   
   /** The speed at which the robot moves forward in degrees per second. */
-  public static final int FORWARD_SPEED = 0;
+  public static final int FORWARD_SPEED = 200;
   
   /** The speed at which the robot rotates in degrees per second. */
-  public static final int ROTATE_SPEED = 0;
+  public static final int ROTATE_SPEED = 80;
   
   /** The motor acceleration in degrees per second squared. */
-  public static final int ACCELERATION = 0;
+  public static final int ACCELERATION = 1000;
   
   /** The tile size in meters. Note that 0.3048 m = 1 ft. */
   public static final double TILE_SIZE = 0.3048;
   
   /** The odometer. */
   public static Odometer odometer = Odometer.getOdometer();
+  
+  
+
+  /** Threshold constant for rising and falling edge cases for the ultrasonic localizer. */
+  public static final int COMMON_D = 40;
+
+  /** Noise margin constant for falling edge ultrasonic localizer. */
+  public static final int FALLINGEDGE_K = 1;
+
+  /** Noise margin constant for rising edge ultrasonic localizer. */
+  public static final int RISINGEDGE_K = 3;
+  
+  
   
   // Hardware resources
 
@@ -76,7 +90,10 @@ public class Resources {
   /** The ultrasonic sensor. */
   public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
   
-  /** The left color sensor. */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S2);
+  /** The color sensor sample provider. */
+  public static final SampleProvider colorSensor1 = new EV3ColorSensor(SensorPort.S2).getRGBMode();
+  
+  /** The color sensor sample provider. */
+  public static final SampleProvider colorSensor2 = new EV3ColorSensor(SensorPort.S3).getRGBMode();
   
 }
