@@ -1,5 +1,6 @@
 package ca.mcgill.ecse211.project;
 import static ca.mcgill.ecse211.project.Resources.*;
+import static ca.mcgill.ecse211.project.Movement.*;
 import java.util.Arrays;
 import simlejos.ExecutionController;
 
@@ -143,21 +144,7 @@ public class UltrasonicLocalizer {
     turnBy(360 - odometer.getXyt()[2]);
   }
   
-  /**
-   * Turns the robot by a specified angle. Note that this method is different from
-   * {@code Navigation.turnTo()}. For example, if the robot is facing 90 degrees, calling
-   * {@code turnBy(90)} will make the robot turn to 180 degrees, but calling
-   * {@code Navigation.turnTo(90)} should do nothing (since the robot is already at 90 degrees).
-   *
-   * @param angle the angle by which to turn, in degrees
-   */
-  public static void turnBy(double angle) {
-    //Similar to moveStraightFor(), but with a minus sign
-    leftMotor.setSpeed(ROTATE_SPEED);
-    rightMotor.setSpeed(ROTATE_SPEED);
-    leftMotor.rotate(convertAngle(angle), true);
-    rightMotor.rotate(-(convertAngle(angle)), false);
-  }
+
   
   /**
    * Converts input distance to the total rotation of each wheel needed to cover that distance.
