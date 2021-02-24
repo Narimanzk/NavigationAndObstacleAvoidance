@@ -51,10 +51,14 @@ public class Navigation {
   
   /** Returns the signed minimal angle in degrees from initial angle to destination angle (deg). */
   public static double minimalAngle(double initialAngle, double destAngle) {
-    return (destAngle-initialAngle)%360; // TODO
+    initialAngle %= 360; // make sure
+    destAngle %= 360;
+    double toTurn = (destAngle - initialAngle + 540) % 360 - 180;
+    return toTurn;
   }
   
   /** Returns the distance between the two points in tile lengths (feet). */
+  //https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
   public static double distanceBetween(Point p1, Point p2) {
     double dx_squared = Math.pow((p2.x - p1.x), 2);
     double dy_squared = Math.pow((p2.y - p1.y), 2);
