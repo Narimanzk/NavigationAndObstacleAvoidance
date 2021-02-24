@@ -1,4 +1,4 @@
-# Lab 5 - Navigation and Obstacle Avoidance
+# Lab 5 - Navigation and Obstacle Avoidance: Team 03
 
 _Read this entire document before doing anything._
 
