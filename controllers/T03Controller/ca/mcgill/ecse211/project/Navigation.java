@@ -96,8 +96,8 @@ public class Navigation {
   }
   
   private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b){
-      Double temp = m*x+b;
-      return temp.compareTo(y)==0;
+      Double curY = m*x+b;
+      return curY.compareTo(y)==0;
   }
   
   private static void wallFollower() {
