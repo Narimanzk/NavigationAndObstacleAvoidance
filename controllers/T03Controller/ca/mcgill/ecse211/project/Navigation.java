@@ -19,21 +19,7 @@ public class Navigation {
    * <p>TODO Describe your algorithm here in detail (then remove these instructions).
    */
   public static void travelTo(Point destination) {
-    
-    double[] curXYT = odometer.getXyt();
-    double x = curXYT[0];
-    double y = curXYT[1];
-    Point current = new Point(x, y);
-    
-    double[] slopeParams = calculateLinearSlope(current, destination);
-    double m = slopeParams[0];
-    double b = slopeParams[1];
-    boolean stopCondition = checkIfPointOnSlope(x, y, m, b);
-    
-    while(!stopCondition) {
-      wallFollower();
-    }
-    
+    goAroundObstacle(destination); // remove this
     // TODO
     // Hint: One way to avoid an obstacle is to calculate a simple path around it and call
     // directTravelTo() to get to points on that path before returning to the original trajectory
@@ -86,6 +72,21 @@ public class Navigation {
   // TODO Bring Navigation-related helper methods from Labs 2 and 3 here
   // You can also add other helper methods here, but remember to document them with Javadoc (/**)!
 
+  private static void goAroundObstacle(Point destination) {
+    double[] curXYT = odometer.getXyt();
+    double x = curXYT[0];
+    double y = curXYT[1];
+    Point current = new Point(x, y);
+    
+    double[] slopeParams = calculateLinearSlope(current, destination);
+    double m = slopeParams[0];
+    double b = slopeParams[1];
+    boolean stopCondition = checkIfPointOnSlope(x, y, m, b);
+    
+    while(!stopCondition) {
+      wallFollower();
+    } 
+  }
   
   private static double[] calculateLinearSlope(Point p1, Point p2) {
     // Calculate y=mx+b which crosses p1, p2
@@ -103,6 +104,7 @@ public class Navigation {
   private static void wallFollower() {
     // dummy
   }
+  
   
   
   
