@@ -34,12 +34,12 @@ public class Navigation {
       wallFollower();
     }
     
-    //...
+    // TODO
+    // Hint: One way to avoid an obstacle is to calculate a simple path around it and call
+    // directTravelTo() to get to points on that path before returning to the original trajectory
     
   }
-  // TODO
-  // Hint: One way to avoid an obstacle is to calculate a simple path around it and call
-  // directTravelTo() to get to points on that path before returning to the original trajectory
+
   
   /** Travels directly (in a straight line) to the given destination. */
   public static void directTravelTo(Point destination) {
