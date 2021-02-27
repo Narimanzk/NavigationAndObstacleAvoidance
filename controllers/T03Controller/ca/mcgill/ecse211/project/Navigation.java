@@ -1,7 +1,6 @@
 package ca.mcgill.ecse211.project;
 
 import static ca.mcgill.ecse211.project.Resources.*;
-import static java.lang.Math.*;
 
 import ca.mcgill.ecse211.playingfield.Point;
 
@@ -39,8 +38,8 @@ public class Navigation {
    * its current orientation is. This method is different from {@code turnBy()}.
    */
   public static void turnTo(double angle) {
-    // TODO
     // Hint: You can do this in one line by reusing some helper methods declared in this class
+    Movement.turnBy(minimalAngle(Odometer.getOdometer().getXyt()[2], angle));
     
   }
 
@@ -49,7 +48,8 @@ public class Navigation {
    * This function does not depend on the robot's current theta.
    */
   public static double getDestinationAngle(Point current, Point destination) {
-    return 0; // TODO
+    return (Math.toDegrees(
+        Math.atan2(destination.x - current.x, destination.y - current.y)) + 360) % 360;
   }
   
   /** Returns the signed minimal angle in degrees from initial angle to destination angle (deg). */
@@ -63,9 +63,9 @@ public class Navigation {
   /** Returns the distance between the two points in tile lengths (feet). */
   //https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
   public static double distanceBetween(Point p1, Point p2) {
-    double dx_squared = Math.pow((p2.x - p1.x), 2);
-    double dy_squared = Math.pow((p2.y - p1.y), 2);
-    double dist = Math.sqrt(dx_squared + dy_squared);
+    double dxSqr = Math.pow((p2.x - p1.x), 2);
+    double dySqr = Math.pow((p2.y - p1.y), 2);
+    double dist = Math.sqrt(dxSqr + dySqr);
     return dist;
   }
   
@@ -73,9 +73,9 @@ public class Navigation {
   // You can also add other helper methods here, but remember to document them with Javadoc (/**)!
 
   private static void goAroundObstacle(Point destination) {
-    double[] curXYT = odometer.getXyt();
-    double x = curXYT[0];
-    double y = curXYT[1];
+    double[] curXyt = odometer.getXyt();
+    double x = curXyt[0];
+    double y = curXyt[1];
     Point current = new Point(x, y);
     
     double[] slopeParams = calculateLinearSlope(current, destination);
@@ -83,7 +83,7 @@ public class Navigation {
     double b = slopeParams[1];
     boolean stopCondition = checkIfPointOnSlope(x, y, m, b);
     
-    while(!stopCondition) {
+    while (!stopCondition) {
       wallFollower();
     } 
   }
@@ -91,14 +91,14 @@ public class Navigation {
   private static double[] calculateLinearSlope(Point p1, Point p2) {
     // Calculate y=mx+b which crosses p1, p2
     double m = (p2.y - p1.y) / (p2.x - p1.x);
-    double b = p1.y - m*(p2.x);
-    double[] params = {m,b};
+    double b = p1.y - m * (p2.x);
+    double[] params = {m, b};
     return params;
   }
   
-  private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b){
-      Double curY = m*x+b;
-      return curY.compareTo(y)==0;
+  private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
+    Double curY = m * x + b;
+    return curY.compareTo(y) == 0;
   }
   
   private static void wallFollower() {
