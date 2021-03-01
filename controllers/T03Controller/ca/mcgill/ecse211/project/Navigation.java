@@ -1,58 +1,62 @@
 package ca.mcgill.ecse211.project;
 
 import static ca.mcgill.ecse211.project.Resources.*;
-
 import ca.mcgill.ecse211.playingfield.Point;
 
-/**
- * The Navigation class is used to make the robot navigate around the playing field.
- */
 public class Navigation {
   
-  /** Do not instantiate this class. */
   private Navigation() {}
   
-  /**
-   * Travels to destination taking obstacles into account.
-   *
-   * <p>TODO Describe your algorithm here in detail (then remove these instructions).
-   */
+
   public static void travelTo(Point destination) {
     goAroundObstacle(destination); // remove this
     // TODO
     // Hint: One way to avoid an obstacle is to calculate a simple path around it and call
     // directTravelTo() to get to points on that path before returning to the original trajectory
     
-  }
-
-  
-  /** Travels directly (in a straight line) to the given destination. */
-  public static void directTravelTo(Point destination) {
-    // TODO
-    // Think carefully about how you would integrate line detection here, if necessary
-    // Don't forget that destination.x and destination.y are in feet, not meters
-  }
-  
-  /**
-   * Turns the robot with a minimal angle towards the given input angle in degrees, no matter what
-   * its current orientation is. This method is different from {@code turnBy()}.
-   */
-  public static void turnTo(double angle) {
-    // Hint: You can do this in one line by reusing some helper methods declared in this class
-    Movement.turnBy(minimalAngle(Odometer.getOdometer().getXyt()[2], angle));
+    /**
+     * Origional obstacle locations:
+     * 1: x=2, y=1.9
+     * 2: x=1.6, y=1.5
+     * 3: x=1.5, y=0.35
+     * 
+     */
     
   }
 
-  /**
-   * Returns the angle that the robot should point towards to face the destination in degrees.
-   * This function does not depend on the robot's current theta.
-   */
+  
+  // TODO
+  // Think carefully about how you would integrate line detection here, if necessary
+  // Don't forget that destination.x and destination.y are in feet, not meters
+  public static void directTravelTo(Point destination) {
+    
+    double[] xyt = odometer.getXyt();
+    Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
+    double travelDist = toMeters(distanceBetween(curPoint, destination));
+    
+    if(travelDist>0.3) { // TODO: decide this 0.3 value
+      double destTheta = getDestinationAngle(curPoint, destination);
+      turnTo(destTheta);
+      Movement.moveStraightFor(travelDist);
+      // TODO: localize and correct odometer here
+    }else{
+      System.out.println("Already at destination.");
+      // TODO: Localize and correct odometer here
+    }
+    
+  }
+  
+
+  public static void turnTo(double angle) {
+    Movement.turnBy(minimalAngle(Odometer.getOdometer().getXyt()[2], angle));
+  }
+
+
   public static double getDestinationAngle(Point current, Point destination) {
     return (Math.toDegrees(
         Math.atan2(destination.x - current.x, destination.y - current.y)) + 360) % 360;
   }
   
-  /** Returns the signed minimal angle in degrees from initial angle to destination angle (deg). */
   public static double minimalAngle(double initialAngle, double destAngle) {
     initialAngle %= 360; // make sure
     destAngle %= 360;
@@ -60,8 +64,7 @@ public class Navigation {
     return toTurn;
   }
   
-  /** Returns the distance between the two points in tile lengths (feet). */
-  //https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
+
   public static double distanceBetween(Point p1, Point p2) {
     double dxSqr = Math.pow((p2.x - p1.x), 2);
     double dySqr = Math.pow((p2.y - p1.y), 2);
@@ -69,9 +72,6 @@ public class Navigation {
     return dist;
   }
   
-  // TODO Bring Navigation-related helper methods from Labs 2 and 3 here
-  // You can also add other helper methods here, but remember to document them with Javadoc (/**)!
-
   private static void goAroundObstacle(Point destination) {
     double[] curXyt = odometer.getXyt();
     double x = curXyt[0];
@@ -89,7 +89,6 @@ public class Navigation {
   }
   
   private static double[] calculateLinearSlope(Point p1, Point p2) {
-    // Calculate y=mx+b which crosses p1, p2
     double m = (p2.y - p1.y) / (p2.x - p1.x);
     double b = p1.y - m * (p2.x);
     double[] params = {m, b};
@@ -105,6 +104,13 @@ public class Navigation {
     // dummy
   }
   
+  public static double toFeet(double meters) {
+    return 3.28084*meters;
+  }
+  
+  public static double toMeters(double feet) {
+    return feet/3.28084;
+  }
   
   
   

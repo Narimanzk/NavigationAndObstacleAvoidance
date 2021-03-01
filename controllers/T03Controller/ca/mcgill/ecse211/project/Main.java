@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import simlejos.ExecutionController;
 
+import ca.mcgill.ecse211.project.Navigation.*;
+
+
+
+
 /**
  * Main class of the program.
  */
@@ -39,7 +44,11 @@ public class Main {
         
     // TODO Localize in the corner like in the previous lab
     UltrasonicLocalizer.localize();
-    LightLocalizer.localize();
+    LightLocalizer.localize();    
+    
+//    Point p = new Point(3,3);
+//    Navigation.directTravelTo(p);
+    
     System.out.println("Done localizing");
     
     var remainingWaypoints = waypoints.subList(1, waypoints.size()); // other than starting point
@@ -47,6 +56,8 @@ public class Main {
     // TODO Travel to the remaining waypoints in order, taking obstacles into account
     remainingWaypoints.forEach(point -> {
       System.out.println("Travel to " + point + ".");
+      Navigation.directTravelTo(point);
+      odometer.printPosition();
     });
     
     odometer.printPositionInTileLengths();

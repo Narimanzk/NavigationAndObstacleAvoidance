@@ -41,6 +41,7 @@ public class TestNavigation {
   @Test void testDistanceBetween() {
     assertEquals(0, distanceBetween(new Point(0, 0), new Point(0, 0)), ERROR_MARGIN);
     assertEquals(2, distanceBetween(new Point(5.5, 3.5), new Point(3.5, 3.5)), ERROR_MARGIN);
+    assertEquals(1.414214, distanceBetween(new Point(1,1), new Point(2,2)), ERROR_MARGIN);
     assertEquals(1.414214, distanceBetween(new Point(1, 5), new Point(2, 4)), ERROR_MARGIN);
     assertEquals(3.162278, distanceBetween(new Point(-1, 5), new Point(2, 4)), ERROR_MARGIN);
     assertEquals(17.464249, distanceBetween(new Point(-10, -21), new Point(-3,-5)), ERROR_MARGIN);
@@ -48,7 +49,9 @@ public class TestNavigation {
   }
   
   // TODO Think about testing your other Navigation functions here
-  
   // You can add helper methods below to be used in the tests above
-
+  
+  
+  
+  
 }
