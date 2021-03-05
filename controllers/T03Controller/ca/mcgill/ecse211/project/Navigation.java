@@ -72,7 +72,7 @@ public class Navigation {
     return dist;
   }
   
-  private static void goAroundObstacle(Point destination) {
+  public static boolean goAroundObstacle(Point destination) {
     double[] curXyt = odometer.getXyt();
     double x = curXyt[0];
     double y = curXyt[1];
@@ -82,10 +82,7 @@ public class Navigation {
     double m = slopeParams[0];
     double b = slopeParams[1];
     boolean stopCondition = checkIfPointOnSlope(x, y, m, b);
-    
-    while (!stopCondition) {
-      wallFollower();
-    } 
+    return stopCondition;
   }
   
   private static double[] calculateLinearSlope(Point p1, Point p2) {
@@ -97,7 +94,10 @@ public class Navigation {
   
   private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
     Double curY = m * x + b;
-    return curY.compareTo(y) == 0;
+    if(curY.compareTo(y)==0) {
+      System.out.println("-------------------------------------");
+      return true;
+    } return false;
   }
   
   private static void wallFollower() {
@@ -105,11 +105,15 @@ public class Navigation {
   }
   
   public static double toFeet(double meters) {
-    return 3.28084*meters;
+    return 3.28084 * meters;
   }
   
+  /*
+   * Converts feet to meters
+   * @param feet
+   */
   public static double toMeters(double feet) {
-    return feet/3.28084;
+    return feet / 3.28084;
   }
   
   
