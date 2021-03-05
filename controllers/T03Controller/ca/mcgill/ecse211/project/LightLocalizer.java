@@ -23,80 +23,125 @@ public class LightLocalizer {
   /** Buffer (array) to store US2 samples. */
   private static float[] sensor2_data = new float[colorSensor2.sampleSize()];
   
-  //Values to operate color sensor
+  /** Values to operate color sensor */
   private static int current_color_blue = 1000;
   private static int current_color_red = 1000;
   
   /**
-   * Localizes the robot to (x, y, theta) = (1, 1, 0).
+   * Localizes the robot to (x, y, theta) = (1, 1, 0)
+   * and sets the odometer to (1,1,0) for our world frame of reference.
    */
   public static void localize() {
+    stepOne();  // Moving towards (y=1) black line.
+    System.out.println("Done step 1");
+    stepTwo();  // Moving toward (1,1)
+    System.out.println("Done step 2");
+    //odometer.setXyt(0.3048, 0.3048, 0);
+  }
+  
+  
+  
+  
+  /**
+   * Localizes the robot to the black line which intersects (1,1).
+   * Does so by moving forwards until both sensors detect a black line.
+   * When a sensor on the left or right detects a black line, the motor on the 
+   * same side will stop, and allow the other motor to detect the black line.
+   * The resulting position of the robot will be a robot which is perpendicular
+   * to the black line which intersects (1,1).
+   */
+  private static void stepOne() {
     //Moving toward black line
     leftMotor.forward();
     rightMotor.forward();
     
+    // Indicators for if the sensors detect a black line.
+    boolean s1Indicator = false;
+    boolean s2Indicator = false;
+    
     //First time that the robot pass the black line
-    while (true) {
-      if (blackLineTrigger(colorSensor1, sensor1_data) 
-          &&  blackLineTrigger(colorSensor2, sensor2_data)) {
+    while (s1Indicator==false || s2Indicator==false) {
+      
+      // If both sensors detect the black line at the same time.
+      if (blackLineTrigger(colorSensor1, sensor1_data) && 
+          blackLineTrigger(colorSensor2, sensor2_data)) {
         leftMotor.stop();
         rightMotor.stop();
-        moveStraightFor(-0.0273);
-        turnBy(90.0);
+        s1Indicator = true;
+        s2Indicator = true;
         break;
-      //When sensor 1 reaches the black line first
-      } else if (blackLineTrigger(colorSensor1, sensor1_data)) {
+      }
+      
+      // If The first sensor detects the black line first.
+      if (blackLineTrigger(colorSensor1, sensor1_data)) {
         rightMotor.stop();
-        if (blackLineTrigger(colorSensor2, sensor2_data)) {
-          leftMotor.stop();
-          moveStraightFor(-0.0273);
-          turnBy(90.0);
-          break;
-        }
-      //When sensor 2 reaches the black line first
-      } else if (blackLineTrigger(colorSensor2, sensor2_data)) {
+        s1Indicator = true;
+      }
+      
+      // If the second sensor detects the black line first
+      if (blackLineTrigger(colorSensor2, sensor2_data)) {
         leftMotor.stop();
-        if (blackLineTrigger(colorSensor1, sensor1_data)) {
-          rightMotor.stop();
-          moveStraightFor(-0.0273);
-          turnBy(90.0);
-          break;
-        }
+        s2Indicator = true;
       }
     }
-    //Moving toward (1,1)
-    while (true) {
+    
+    // Prepare the position of the robot to head to (1,1)
+    moveStraightFor(-0.0273);
+    turnBy(90.0);
+  }
+  
+  
+  
+  
+  /**
+   * Localizes the robot to (1,1,0)
+   * Does so in the same way as step 1,
+   * however it moves straight for a greater amount of time so as
+   * to place the robot at (1,1,0) with reference to the odometer.
+   */
+  private static void stepTwo() {
+    
+    // Indicators for if the sensors detect a black line.
+    boolean s1Indicator = false;
+    boolean s2Indicator = false;
+    
+    while (s1Indicator==false || s2Indicator==false) {   
       leftMotor.setSpeed(FORWARD_SPEED);
       rightMotor.setSpeed(FORWARD_SPEED);
       leftMotor.forward();
       rightMotor.forward();      
-      //When it reaches (1,1)
+      
+      //When it reaches (1,1) with both sensors at the same time
       if (blackLineTrigger(colorSensor1, sensor1_data)
           && blackLineTrigger(colorSensor2, sensor2_data)) {
         leftMotor.stop();
         rightMotor.stop();
-        moveStraightFor(-0.0273 * 3.5);
-        turnBy(-90.0);
+        s1Indicator = true;
+        s2Indicator = true;
         break;
-      } else if (blackLineTrigger(colorSensor1, sensor1_data)) {
+      } 
+
+      //When it reaches (1,1) with sensor1 first
+      if (blackLineTrigger(colorSensor1, sensor1_data)) {
         rightMotor.stop();
-        if (blackLineTrigger(colorSensor2, sensor2_data)) {
-          leftMotor.stop();
-          moveStraightFor(-0.0273 * 3.5);
-          turnBy(-90.0);
-          break;
-        }
-      } else if (blackLineTrigger(colorSensor2, sensor2_data)) {
+        s1Indicator = true;
+      }
+      
+      //When it reaches (1,1) with sensor2 first
+      if (blackLineTrigger(colorSensor2, sensor2_data)) {
         leftMotor.stop();
-        if (blackLineTrigger(colorSensor1, sensor1_data)) {
-          rightMotor.stop();
-          moveStraightFor(-0.0273 * 3.5);
-          turnBy(-90.0);
-          break;
-        }
+        s2Indicator = true;
       }
     }
+    
+    // correct the position to (1,1,0).
+    moveStraightFor(-0.0273 * 3.5);
+    turnBy(-90.0);
   }
+  
+  
+  
+  
   
   /**
    * The method fetches data recorded by the color sensors in RedMode 
@@ -109,7 +154,6 @@ public class LightLocalizer {
    */
   public static boolean blackLineTrigger(SampleProvider colorSensor, float[] sensor) {
     colorSensor.fetchSample(sensor, 0);
-    
     current_color_blue = (int) (sensor[2]);
     current_color_red = (int) (sensor[0]);
 
