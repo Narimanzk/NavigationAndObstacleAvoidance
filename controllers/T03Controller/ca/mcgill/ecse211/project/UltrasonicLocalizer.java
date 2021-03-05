@@ -11,17 +11,17 @@ import simlejos.ExecutionController;
 public class UltrasonicLocalizer {
   
 
-  /** The previous distance recorded by ultrasonic sensor. */
-  private static int prevDistance;
-  
-  /** The latest distance recorded by ultrasonic sensor. */
-  private static int distance;
-  
-  /** The number of invalid samples seen by filter() so far. */
-  private static int invalidSampleCount;
-  
-  /** Buffer (array) to store US samples. */
-  private static float[] usData = new float[usSensor.sampleSize()];
+//  /** The previous distance recorded by ultrasonic sensor. */
+//  private static int prevDistance;
+//  
+//  /** The latest distance recorded by ultrasonic sensor. */
+//  private static int distance;
+//  
+//  /** The number of invalid samples seen by filter() so far. */
+//  private static int invalidSampleCount;
+//  
+//  /** Buffer (array) to store US samples. */
+//  private static float[] usData = new float[usSensor.sampleSize()];
   
   /** Angle at which back wall is detected. */
   public static double alpha;

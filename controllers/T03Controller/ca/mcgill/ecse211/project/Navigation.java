@@ -7,27 +7,51 @@ public class Navigation {
   
   private Navigation() {}
   
-
   public static void travelTo(Point destination) {
-    goAroundObstacle(destination); // remove this
-    // TODO
-    // Hint: One way to avoid an obstacle is to calculate a simple path around it and call
-    // directTravelTo() to get to points on that path before returning to the original trajectory
+    leftMotor.setSpeed(100);
+    rightMotor.setSpeed(100);
+    while(true) {
+        leftMotor.forward();
+        rightMotor.forward();
+        System.out.println(Movement.readUsDistance());
+        if (Movement.readUsDistance() < 20) {
+          Point p1 = new Point(odometer.getXyt()[0]/0.3048,odometer.getXyt()[1]/0.3048);
+          double p2x = Math.floor((odometer.getXyt()[0]/0.3048) * 10)/10;
+          double p2y = Math.floor((odometer.getXyt()[1]/0.3048) * 10)/10;
+          Point p2 = new Point(p2x,p2y + 2.0);
+          System.out.println("initial x: " + (odometer.getXyt()[0]/0.3048) + " initial y: " + ((odometer.getXyt()[1]/0.3048) + 2.0));
+          calculateLinearSlope(p1, p2);
+          break; 
+        }
+    }
+    leftMotor.stop();
+    rightMotor.stop();
+    while (true) {
+      Movement.controller(Movement.readUsDistance(), motorSpeeds);
+      leftMotor.setSpeed(100);
+      rightMotor.setSpeed(100);
+      leftMotor.forward();
+      rightMotor.forward();
+      double[] curXyt = odometer.getXyt();
+      double x = curXyt[0];
+      double y = curXyt[1];
+      Point current = new Point(x, y);
+      boolean stopCond = checkIfPointOnSlope(x,y,params[0],params[1]);
+      if(stopCond) {
+        leftMotor.stop();
+        rightMotor.stop();
+        diffFlag = false;
+        break;
+      }
     
-    /**
-     * Origional obstacle locations:
-     * 1: x=2, y=1.9
-     * 2: x=1.6, y=1.5
-     * 3: x=1.5, y=0.35
-     * 
-     */
+    }
+    double angle = odometer.getXyt()[2];
+    Movement.turnBy(-angle);
     
   }
 
   
-  // TODO
-  // Think carefully about how you would integrate line detection here, if necessary
-  // Don't forget that destination.x and destination.y are in feet, not meters
+
   public static void directTravelTo(Point destination) {
     
     double[] xyt = odometer.getXyt();
@@ -50,28 +74,22 @@ public class Navigation {
   public static void turnTo(double angle) {
     Movement.turnBy(minimalAngle(Odometer.getOdometer().getXyt()[2], angle));
   }
-
-
   public static double getDestinationAngle(Point current, Point destination) {
     return (Math.toDegrees(
         Math.atan2(destination.x - current.x, destination.y - current.y)) + 360) % 360;
   }
-  
   public static double minimalAngle(double initialAngle, double destAngle) {
     initialAngle %= 360; // make sure
     destAngle %= 360;
     double toTurn = (destAngle - initialAngle + 540) % 360 - 180;
     return toTurn;
   }
-  
-
   public static double distanceBetween(Point p1, Point p2) {
     double dxSqr = Math.pow((p2.x - p1.x), 2);
     double dySqr = Math.pow((p2.y - p1.y), 2);
     double dist = Math.sqrt(dxSqr + dySqr);
     return dist;
   }
-  
   public static boolean goAroundObstacle(Point destination) {
     double[] curXyt = odometer.getXyt();
     double x = curXyt[0];
@@ -91,31 +109,41 @@ public class Navigation {
     double[] params = {m, b};
     return params;
   }
-  
   private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
+//    Double curY = m * x + b;
+//    return (curY.compareTo(y)==0) 
+    
     Double curY = m * x + b;
-    if(curY.compareTo(y)==0) {
-      System.out.println("-------------------------------------");
-      return true;
-    } return false;
-  }
-  
-  private static void wallFollower() {
-    // dummy
+    double difference = Math.abs(curY - y);
+    System.out.println("difference: " + difference);
+    System.out.println("x: " + x + "y: " + y);
+    System.out.println("m: " + m + "b: " + b);
+//    if(difference < 4.91) {
+//      counter++;
+//    }
+//    System.out.println("counter: " + counter);
+//    if( counter > 50 && difference < 4.91) {
+//      return true;
+//    }
+//    else return false;
+    if (difference > 5.0) diffFlag = true;
+    if (difference < 4.902 && diffFlag) return true;
+    return false;
+    
+
   }
   
   public static double toFeet(double meters) {
     return 3.28084 * meters;
   }
-  
-  /*
-   * Converts feet to meters
-   * @param feet
-   */
   public static double toMeters(double feet) {
     return feet / 3.28084;
   }
-  
+  public static Point getCurrentPoint() {
+    double[] xyt = odometer.getXyt();
+    Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
+    return curPoint;
+  }
   
   
 }

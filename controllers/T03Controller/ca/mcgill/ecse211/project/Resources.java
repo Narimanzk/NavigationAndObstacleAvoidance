@@ -1,5 +1,6 @@
 package ca.mcgill.ecse211.project;
 
+import static ca.mcgill.ecse211.project.Resources.usSensor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import simlejos.hardware.motor.Motor;
@@ -97,5 +98,36 @@ public class Resources {
   
   /** The color sensor sample provider. */
   public static final SampleProvider colorSensor2 = new EV3ColorSensor(SensorPort.S3).getRGBMode();
+  
+  
+  
+  
+  // ---------------------------------------------------
+  public static final int WALL_DIST = 20;
+  public static final int WALL_DIST_ERR_THRESH = 0;
+  
+  public static int[] motorSpeeds = new int[2];
+  public static final int LEFT = 0;
+  public static final int RIGHT = 1;
+  
+  public static final int MOTOR_LOW = 80;
+  public static final int MOTOR_HIGH = 300;
+  
+  public static int distance_error;
+  public static int prevDistance;
+  public static int distance;
+  public static int invalidSampleCount;
+  
+  public static boolean usRotate = true;
+  public static float[] usData = new float[usSensor.sampleSize()];
+  
+  public static double[] params = {0,0};
+  public static int counter  = 0;
+  public static boolean diffFlag = false;
+  
+  
+  
+  
+  
   
 }
