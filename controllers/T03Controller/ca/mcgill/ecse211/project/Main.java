@@ -41,6 +41,9 @@ public class Main {
   private static int counter  = 0;
   
   private static boolean diffFlag = false;
+  private static Point startPoint;
+  
+  private static final double EPSILON = 0.012; 
   
   /** The main entry point. */
   public static void main(String[] args) {
@@ -52,19 +55,14 @@ public class Main {
     ExecutionController.performPhysicsStepsInBackground(PHYSICS_STEP_PERIOD);
     new Thread(odometer).start();
     
-    leftMotor.setSpeed(100);
-    rightMotor.setSpeed(100);
+    leftMotor.setSpeed(300);
+    rightMotor.setSpeed(300);
     while(true) {
         leftMotor.forward();
         rightMotor.forward();
         System.out.println(readUsDistance());
-        if (readUsDistance() < 20) {
-          Point p1 = new Point(odometer.getXyt()[0]/0.3048,odometer.getXyt()[1]/0.3048);
-          double p2x = Math.floor((odometer.getXyt()[0]/0.3048) * 10)/10;
-          double p2y = Math.floor((odometer.getXyt()[1]/0.3048) * 10)/10;
-          Point p2 = new Point(p2x,p2y + 2.0);
-          System.out.println("initial x: " + (odometer.getXyt()[0]/0.3048) + " initial y: " + ((odometer.getXyt()[1]/0.3048) + 2.0));
-          calculateLinearSlope(p1, p2);
+        if (readUsDistance() < 15) {
+          startPoint = new Point(odometer.getXyt()[0]/0.3048,odometer.getXyt()[1]/0.3048);
           break; 
         }
     }
@@ -76,10 +74,10 @@ public class Main {
       leftMotor.forward();
       rightMotor.forward();
       double[] curXyt = odometer.getXyt();
-      double x = curXyt[0];
-      double y = curXyt[1];
+      double x = curXyt[0]/0.3048;
+      double y = curXyt[1]/0.3048;
       Point current = new Point(x, y);
-      boolean stopCond = checkIfPointOnSlope(x,y,params[0],params[1]);
+      boolean stopCond = checkIfPointOnSlope(startPoint, current);
       if(stopCond) {
         leftMotor.stop();
         rightMotor.stop();
@@ -99,23 +97,11 @@ public class Main {
     params[1] = b;
   }
   
-  private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
-    Double curY = m * x + b;
-    double difference = Math.abs(curY - y);
-    System.out.println("difference: " + difference);
-    System.out.println("x: " + x + "y: " + y);
-    System.out.println("m: " + m + "b: " + b);
-//    if(difference < 4.91) {
-//      counter++;
-//    }
-//    System.out.println("counter: " + counter);
-//    if( counter > 50 && difference < 4.91) {
-//      return true;
-//    }
-//    else return false;
-    if (difference > 5.0) diffFlag = true;
-    if (difference < 4.902 && diffFlag) return true;
-    return false;
+  private static boolean checkIfPointOnSlope(Point start, Point curr) {
+    double xDiff = Math.abs(start.x - curr.x); 
+    double yDiff = Math.abs(start.y - curr.y);
+    
+    return((xDiff < EPSILON && !usRotate) || (yDiff < EPSILON && !usRotate));
   }
   
   /** Sets the speeds of the left and right motors from the motorSpeeds array. */
@@ -133,8 +119,8 @@ public class Main {
   public static void controller(int distance, int[] motorSpeeds) {
     int leftSpeed = MOTOR_HIGH;
     int rightSpeed = MOTOR_HIGH;
-    //System.out.println("US value: " + distance);
-    if (distance > 40 && usRotate) {
+    System.out.println("US value: " + distance);
+    if (distance > 30 && usRotate) {
       leftMotor.stop();
       rightMotor.stop();
       usMotor.setSpeed(100);
@@ -172,7 +158,7 @@ public class Main {
     for (int i = 0; i < filterArr.length; i++) {
       usSensor.fetchSample(usData, 0);
       filterArr[i] = (int) (usData[0] * 100); 
-      ExecutionController.sleepFor(60);
+      //ExecutionController.sleepFor(60);
     }
     return filter(filterArr);
   }
