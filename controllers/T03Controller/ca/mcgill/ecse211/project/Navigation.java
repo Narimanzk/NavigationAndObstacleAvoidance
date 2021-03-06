@@ -8,45 +8,6 @@ public class Navigation {
   private Navigation() {}
   
   public static void travelTo(Point destination) {
-    leftMotor.setSpeed(100);
-    rightMotor.setSpeed(100);
-    while(true) {
-        leftMotor.forward();
-        rightMotor.forward();
-        System.out.println(Movement.readUsDistance());
-        if (Movement.readUsDistance() < 20) {
-          Point p1 = new Point(odometer.getXyt()[0]/0.3048,odometer.getXyt()[1]/0.3048);
-          double p2x = Math.floor((odometer.getXyt()[0]/0.3048) * 10)/10;
-          double p2y = Math.floor((odometer.getXyt()[1]/0.3048) * 10)/10;
-          Point p2 = new Point(p2x,p2y + 2.0);
-          System.out.println("initial x: " + (odometer.getXyt()[0]/0.3048) + " initial y: " + ((odometer.getXyt()[1]/0.3048) + 2.0));
-          calculateLinearSlope(p1, p2);
-          break; 
-        }
-    }
-    leftMotor.stop();
-    rightMotor.stop();
-    while (true) {
-      Movement.controller(Movement.readUsDistance(), motorSpeeds);
-      leftMotor.setSpeed(100);
-      rightMotor.setSpeed(100);
-      leftMotor.forward();
-      rightMotor.forward();
-      double[] curXyt = odometer.getXyt();
-      double x = curXyt[0];
-      double y = curXyt[1];
-      Point current = new Point(x, y);
-      boolean stopCond = checkIfPointOnSlope(x,y,params[0],params[1]);
-      if(stopCond) {
-        leftMotor.stop();
-        rightMotor.stop();
-        diffFlag = false;
-        break;
-      }
-    
-    }
-    double angle = odometer.getXyt()[2];
-    Movement.turnBy(-angle);
     
   }
 
@@ -110,27 +71,8 @@ public class Navigation {
     return params;
   }
   private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
-//    Double curY = m * x + b;
-//    return (curY.compareTo(y)==0) 
-    
     Double curY = m * x + b;
-    double difference = Math.abs(curY - y);
-    System.out.println("difference: " + difference);
-    System.out.println("x: " + x + "y: " + y);
-    System.out.println("m: " + m + "b: " + b);
-//    if(difference < 4.91) {
-//      counter++;
-//    }
-//    System.out.println("counter: " + counter);
-//    if( counter > 50 && difference < 4.91) {
-//      return true;
-//    }
-//    else return false;
-    if (difference > 5.0) diffFlag = true;
-    if (difference < 4.902 && diffFlag) return true;
-    return false;
-    
-
+    return (curY.compareTo(y)==0);
   }
   
   public static double toFeet(double meters) {
