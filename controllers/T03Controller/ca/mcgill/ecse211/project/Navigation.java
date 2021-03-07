@@ -8,6 +8,22 @@ public class Navigation {
   private Navigation() {}
   
   public static void travelTo(Point destination) {
+    int noiseTolerance = 2;
+    Movement.setMotorSpeeds(200);
+    while(true) {
+      Movement.drive();
+      System.out.println(AvoidObstacle.readUsDistance());
+      if (AvoidObstacle.readUsDistance() < 9) {  // and make sure we're not at destination.
+        noiseTolerance--;
+      }
+      if(noiseTolerance==0) {
+        Point startPoint = new Point(odometer.getXyt()[0]/0.3048,odometer.getXyt()[1]/0.3048); 
+        AvoidObstacle.avoid(startPoint, destination);
+        break; 
+      }
+    }
+    noiseTolerance = 5;
+    Movement.stopMotors();
     
   }
 
@@ -15,19 +31,19 @@ public class Navigation {
 
   public static void directTravelTo(Point destination) {
     
-    double[] xyt = odometer.getXyt();
-    Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
-    double travelDist = toMeters(distanceBetween(curPoint, destination));
-    
-    if(travelDist>0.3) { // TODO: decide this 0.3 value
-      double destTheta = getDestinationAngle(curPoint, destination);
-      turnTo(destTheta);
-      Movement.moveStraightFor(travelDist);
-      // TODO: localize and correct odometer here
-    }else{
-      System.out.println("Already at destination.");
-      // TODO: Localize and correct odometer here
-    }
+//    double[] xyt = odometer.getXyt();
+//    Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
+//    double travelDist = toMeters(distanceBetween(curPoint, destination));
+//    
+//    if(travelDist>0.3) { // TODO: decide this 0.3 value
+//      double destTheta = getDestinationAngle(curPoint, destination);
+//      turnTo(destTheta);
+//      Movement.moveStraightFor(travelDist);
+//      // TODO: localize and correct odometer here
+//    }else{
+//      System.out.println("Already at destination.");
+//      // TODO: Localize and correct odometer here
+//    }
     
   }
   
@@ -51,39 +67,23 @@ public class Navigation {
     double dist = Math.sqrt(dxSqr + dySqr);
     return dist;
   }
-  public static boolean goAroundObstacle(Point destination) {
-    double[] curXyt = odometer.getXyt();
-    double x = curXyt[0];
-    double y = curXyt[1];
-    Point current = new Point(x, y);
-    
-    double[] slopeParams = calculateLinearSlope(current, destination);
-    double m = slopeParams[0];
-    double b = slopeParams[1];
-    boolean stopCondition = checkIfPointOnSlope(x, y, m, b);
-    return stopCondition;
-  }
-  
-  private static double[] calculateLinearSlope(Point p1, Point p2) {
-    double m = (p2.y - p1.y) / (p2.x - p1.x);
-    double b = p1.y - m * (p2.x);
-    double[] params = {m, b};
-    return params;
-  }
-  private static boolean checkIfPointOnSlope(Double x, Double y, Double m, Double b) {
-    Double curY = m * x + b;
-    return (curY.compareTo(y)==0);
-  }
-  
+
   public static double toFeet(double meters) {
     return 3.28084 * meters;
   }
   public static double toMeters(double feet) {
     return feet / 3.28084;
   }
-  public static Point getCurrentPoint() {
+  
+  public static Point getCurrentPoint_feet() {
     double[] xyt = odometer.getXyt();
     Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
+    return curPoint;
+  }
+  
+  public static Point getCurrentPoint_meters() {
+    double[] xyt = odometer.getXyt();
+    Point curPoint = new Point(xyt[0], xyt[1]);
     return curPoint;
   }
   

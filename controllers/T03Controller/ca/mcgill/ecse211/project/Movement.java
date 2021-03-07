@@ -73,7 +73,20 @@ public class Movement {
   
   
   // ====================================================================
+  public static void setMotorSpeeds(int speed) {
+    leftMotor.setSpeed(speed);
+    rightMotor.setSpeed(speed);
+  }
   
+  public static void stopMotors() {
+    leftMotor.stop();
+    rightMotor.stop();
+  }
+  
+  public static void drive() { // Called in AvoidObstacle do not remove!!
+    leftMotor.forward();
+    rightMotor.forward();
+  }
 
   
   
