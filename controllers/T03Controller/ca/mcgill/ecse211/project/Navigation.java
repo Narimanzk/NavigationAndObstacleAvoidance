@@ -55,8 +55,20 @@ public class Navigation {
       travelToObstacle(destination);
     }
     
-    LightLocalizer.localize();
+    double tolerance = 0.4;
+    if(roughlySame(curPoint.x, destination.x, tolerance) ||
+       roughlySame(curPoint.y, destination.y, tolerance)
+    ){
+      LightLocalizer.localize_2();
+    }else {
+      System.out.println("localize_3()");
+    }
         
+  }
+  
+  public static boolean roughlySame(double a, double b, double tolerance) {
+    double diff = Math.abs(a-b);
+    return (diff < tolerance);
   }
 
   public static void directTravelTo(Point destination) {
@@ -72,11 +84,11 @@ public class Navigation {
     while(true) {
       Movement.drive();
       Point cur = getCurrentPoint_feet();
-      if(comparePoints(cur,destination)) {
+      if(comparePoints(cur,destination, 1)) {
         System.out.println("Near destination, stop detecting obstacles.");
         break;
       }
-      if (AvoidObstacle.readUsDistance() < 10) {
+      if (AvoidObstacle.readUsDistance() < 12) {
         noiseTolerance--;
       }
       if(noiseTolerance==0) {
@@ -86,13 +98,13 @@ public class Navigation {
       }
     }
     noiseTolerance = 2;
-    Movement.stopMotors();
+    directTravelTo(destination); // do remaining bit once it's safe to say we've cleared the obstacle.
   }
   
   
-  public static boolean comparePoints(Point cur, Point destination) {
+  public static boolean comparePoints(Point cur, Point destination, double tolerance) {
     double distCurDest = distanceBetween(cur,destination);
-    return (distCurDest < 0.2);
+    return (distCurDest < tolerance);
   }
 
   // verify that both destination and current are in the green zone --> no obstacles

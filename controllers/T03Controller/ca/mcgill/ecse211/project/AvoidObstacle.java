@@ -125,7 +125,6 @@ public class AvoidObstacle {
   
   private static boolean distIndicator(Point start, Point curr) {
     double distance = Navigation.distanceBetween(start, curr);
-    System.out.println(distance);
     if(distance > 0.5) {
       return true;
     } return false;
@@ -155,7 +154,10 @@ public class AvoidObstacle {
     int leftSpeed = MOTOR_HIGH;
     int rightSpeed = MOTOR_HIGH;
     
-    if (distance > 17 && notReturningFlag) { // initial rotation to give us some leeway with the wall following
+    if (distance > 10 && notReturningFlag) { // initial rotation to give us some leeway with the wall following
+      
+      System.out.println("Correcting==================================================");
+      
       int motorRotate = 45; 
       int robotRotate = -70; 
       
@@ -169,7 +171,7 @@ public class AvoidObstacle {
       usMotor.setSpeed(100);
       usMotor.rotate(motorRotate, false); // rotate the sensor by 45 degrees, to see the wall better
       Movement.turnBy(robotRotate); // rotate the robot too
-      Movement.moveStraightFor(0.06475); // move forward a bit to get some leeway
+      Movement.moveStraightFor(0.04475); // move forward a bit to get some leeway
       usMotor.rotate(motorRotate, false); // rotate the sensor again by 45, will help see the obstacle better again
       usMotor.stop();
       notReturningFlag = false; // once these initial rotations are done, we never do them again

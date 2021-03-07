@@ -41,6 +41,7 @@ public class Main {
     odometer.printPosition();
     
 //    Navigation.directTravelTo(new Point(1,7));
+
     
     var remainingWaypoints = waypoints.subList(1, waypoints.size()); // other than starting point   
     remainingWaypoints.forEach(point -> {
@@ -49,6 +50,7 @@ public class Main {
       odometer.printPosition();
     });
     
+    Navigation.directTravelTo(startingPoint); // TODO change this
     Movement.stopMotors();
     
     odometer.printPositionInTileLengths();

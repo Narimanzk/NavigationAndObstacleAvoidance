@@ -36,6 +36,11 @@ public class LightLocalizer {
     stepTwo();  // Moving toward (1,1)
   }
   
+  public static void localize_2() {
+    stepOne();
+    stepTwo_2();
+  }
+  
 
   
   
@@ -137,6 +142,47 @@ public class LightLocalizer {
     moveStraightFor(-0.0273 * 3.5);
     turnBy(-90.0);
   }
+  
+  
+  private static void stepTwo_2() {
+    // Indicators for if the sensors detect a black line.
+    boolean s1Indicator = false;
+    boolean s2Indicator = false;
+    
+    while (s1Indicator==false || s2Indicator==false) {   
+      leftMotor.setSpeed(FORWARD_SPEED);
+      rightMotor.setSpeed(FORWARD_SPEED);
+      leftMotor.forward();
+      rightMotor.forward();      
+      
+      //When it reaches (1,1) with both sensors at the same time
+      if (blackLineTrigger(colorSensor1, sensor1_data)
+          && blackLineTrigger(colorSensor2, sensor2_data)) {
+        leftMotor.stop();
+        rightMotor.stop();
+        s1Indicator = true;
+        s2Indicator = true;
+        break;
+      } 
+
+      //When it reaches (1,1) with sensor1 first
+      if (blackLineTrigger(colorSensor1, sensor1_data)) {
+        rightMotor.stop();
+        s1Indicator = true;
+      }
+      
+      //When it reaches (1,1) with sensor2 first
+      if (blackLineTrigger(colorSensor2, sensor2_data)) {
+        leftMotor.stop();
+        s2Indicator = true;
+      }
+    }
+    
+    // correct the position to (1,1,0).
+    moveStraightFor(-0.0273 * 3.5);
+//    turnBy(-90.0);
+  }
+  
   
   
   
