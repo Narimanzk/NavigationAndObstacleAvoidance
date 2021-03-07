@@ -33,12 +33,10 @@ public class LightLocalizer {
    */
   public static void localize() {
     stepOne();  // Moving towards (y=1) black line.
-    System.out.println("Done step 1");
     stepTwo();  // Moving toward (1,1)
-    System.out.println("Done step 2");
-    //odometer.setXyt(0.3048, 0.3048, 0);
   }
   
+
   
   
   

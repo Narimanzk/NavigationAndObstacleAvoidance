@@ -76,15 +76,15 @@ public class AvoidObstacle {
       controller(readUsDistance(), motorSpeeds);
       setMotorSpeeds();
       Movement.drive();
-//      Point curPoint = Navigation.getCurrentPoint_feet();
-//      if(checkIfPointOnSlope(curPoint.x, curPoint.y, slopeParams[0], slopeParams[1])) {
-//        Movement.stopMotors();
-//        break;
-//      }
+      Point curPoint = Navigation.getCurrentPoint_feet();
       if(checkIfPointOnSlope(startPoint, Navigation.getCurrentPoint_feet())) {
         Movement.stopMotors();
         break;
       }
+//      if(checkIfPointOnSlope(slopeParams[0], slopeParams[1], startPoint, Navigation.getCurrentPoint_feet())) {
+//        Movement.stopMotors();
+//        break;
+//      }
     }
   }
   
@@ -108,17 +108,16 @@ public class AvoidObstacle {
     return params;
   }
 
-//  private static boolean checkIfPointOnSlope(double x, double y, double m, double b) {
-//    Point curr = Navigation.getCurrentPoint_feet();
-//    boolean dist = distIndicator(new Point(x,y), curr);
+//  private static boolean checkIfPointOnSlope(double m, double b, Point start, Point curr) {
+//    boolean dist = distIndicator(start, curr);
 //    if(m==0) {
-//      double xDiff = Math.abs(x - curr.x); // just get the difference between x and y coords of points, check if either is less than epsilon
-//      double yDiff = Math.abs(y - curr.y);
+//      double xDiff = Math.abs(start.x - curr.x); // just get the difference between x and y coords of points, check if either is less than epsilon
+//      double yDiff = Math.abs(start.y - curr.y);
 //      System.out.println(yDiff+"\t"+xDiff+"\t"+dist);
 //      return((xDiff < EPSILON && !notReturningFlag && dist) || (yDiff < EPSILON && !notReturningFlag && dist));    
 //    } else {
-//      double curY = m * x + b;
-//      double diff = Math.abs(curY - y);
+//      double curY = m * curr.x + b;
+//      double diff = Math.abs(curY - start.y);
 //      System.out.println(diff);
 //      return(diff < EPSILON && !notReturningFlag && dist); 
 //    }
@@ -156,34 +155,41 @@ public class AvoidObstacle {
     int leftSpeed = MOTOR_HIGH;
     int rightSpeed = MOTOR_HIGH;
     
-    if (notReturningFlag) {
-      int motorRotate = 90; 
-      int robotRotate = -90; 
-      if(turningRight) {
-        motorRotate = -90; 
+    if (distance > 17 && notReturningFlag) { // initial rotation to give us some leeway with the wall following
+      int motorRotate = 45; 
+      int robotRotate = -70; 
+      
+      if(turningRight) { // values are inverted for a right turn 
+        motorRotate = -45; 
         robotRotate = 90;
       }
       
       leftMotor.stop();
       rightMotor.stop();
       usMotor.setSpeed(100);
-      usMotor.rotate(motorRotate, false);
-      Movement.turnBy(robotRotate);
-      Movement.moveStraightFor(0.06475);
-      notReturningFlag = false;
+      usMotor.rotate(motorRotate, false); // rotate the sensor by 45 degrees, to see the wall better
+      Movement.turnBy(robotRotate); // rotate the robot too
+      Movement.moveStraightFor(0.06475); // move forward a bit to get some leeway
+      usMotor.rotate(motorRotate, false); // rotate the sensor again by 45, will help see the obstacle better again
+      usMotor.stop();
+      notReturningFlag = false; // once these initial rotations are done, we never do them again
     }
     distance_error = turningRight? WALL_DIST_RIGHT - distance : WALL_DIST_LEFT - distance;
 
+    //When the sensor detects no obstacles the robot goes straight
     if (Math.abs(distance_error) <= WALL_DIST_ERR_THRESH) {
       leftSpeed = MOTOR_HIGH;
       rightSpeed = MOTOR_HIGH;
+      //When the sensor detects the robot is getting too close to the wall it goes away from wall
     } else if (distance_error > 0) {
       rightSpeed = turningRight ? MOTOR_LOW :  MOTOR_HIGH + MOTOR_LOW;
       leftSpeed = turningRight ? MOTOR_HIGH + MOTOR_LOW : MOTOR_LOW;
+      //When the sensor detects the robot is getting too far from the wall it goes towards the wall
     } else if (distance_error < 0) {
       rightSpeed = turningRight ? MOTOR_HIGH + MOTOR_LOW : MOTOR_LOW;
       leftSpeed = turningRight ? MOTOR_LOW : MOTOR_HIGH + MOTOR_LOW;
     }
+    //      //Sets the speed of left and right motors
     motorSpeeds[LEFT] = leftSpeed;
     motorSpeeds[RIGHT] = rightSpeed;
   }

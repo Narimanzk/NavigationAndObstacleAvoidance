@@ -8,12 +8,75 @@ public class Navigation {
   private Navigation() {}
   
   public static void travelTo(Point destination) {
+    Point curPoint = getCurrentPoint_feet();
+    double travelDist = toMeters(distanceBetween(curPoint, destination));
+    double destTheta = getDestinationAngle(curPoint, destination);
+    double[] xyt = odometer.getXyt();
+
+    double angleDiff = Math.abs(destTheta - xyt[2]);
+    
+    // case 1: we're already at the destination
+    if(travelDist < 0.3) {
+      System.out.println("Already at destination.");
+      return;
+    }
+    
+    // case 2 : we're facing the right way and we know there won't be obstacles
+    if((angleDiff < 6.0 || angleDiff > 354.0) &&
+       (pathInGreenZone(curPoint, destination))
+    ){
+      System.out.println("Already Pointing in the right direction, no obstacles ahead.");
+      Movement.moveStraightFor(travelDist); 
+    }
+
+    // case 3 : we're facing the right way and there might be obstacles
+    else if(
+        (angleDiff < 6.0 || angleDiff > 354.0) &&
+        (!pathInGreenZone(curPoint, destination))
+    ){
+      System.out.println("Already Pointing in the right direction, might have obstacles ahead.");
+      travelToObstacle(destination);
+    }
+    
+    // case 4 : we have to turn and we know there won't be obstacles
+    else if(
+        (angleDiff >= 6.0 || angleDiff <= 354.0) &&
+        (pathInGreenZone(curPoint, destination))
+    ){
+      System.out.println("Destination has no obstacles ahead.");
+      turnTo(destTheta);
+      Movement.moveStraightFor(travelDist);
+    }
+    
+    // case 5 : we have to turn and there might be obstacles.
+    else {
+      System.out.println("Destination might have obstacles ahead.");
+      turnTo(destTheta);
+      travelToObstacle(destination);
+    }
+    
+    LightLocalizer.localize();
+        
+  }
+
+  public static void directTravelTo(Point destination) {
+    Point curPoint = getCurrentPoint_feet();
+    double travelDist = distanceBetween(curPoint, destination);
+    System.out.println("Distance :"+travelDist);
+    Movement.moveStraightFor(toMeters(travelDist));
+  }
+  
+  public static void travelToObstacle(Point destination) {
     int noiseTolerance = 2;
     Movement.setMotorSpeeds(200);
     while(true) {
       Movement.drive();
-      System.out.println(AvoidObstacle.readUsDistance());
-      if (AvoidObstacle.readUsDistance() < 9) {  // and make sure we're not at destination.
+      Point cur = getCurrentPoint_feet();
+      if(comparePoints(cur,destination)) {
+        System.out.println("Near destination, stop detecting obstacles.");
+        break;
+      }
+      if (AvoidObstacle.readUsDistance() < 10) {
         noiseTolerance--;
       }
       if(noiseTolerance==0) {
@@ -22,33 +85,23 @@ public class Navigation {
         break; 
       }
     }
-    noiseTolerance = 5;
+    noiseTolerance = 2;
     Movement.stopMotors();
-    
-  }
-
-  
-  
-
-  public static void directTravelTo(Point destination) {
-    
-//    double[] xyt = odometer.getXyt();
-//    Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
-//    double travelDist = toMeters(distanceBetween(curPoint, destination));
-//    
-//    if(travelDist>0.3) { // TODO: decide this 0.3 value
-//      double destTheta = getDestinationAngle(curPoint, destination);
-//      turnTo(destTheta);
-//      Movement.moveStraightFor(travelDist);
-//      // TODO: localize and correct odometer here
-//    }else{
-//      System.out.println("Already at destination.");
-//      // TODO: Localize and correct odometer here
-//    }
-    
   }
   
+  
+  public static boolean comparePoints(Point cur, Point destination) {
+    double distCurDest = distanceBetween(cur,destination);
+    return (distCurDest < 0.2);
+  }
 
+  // verify that both destination and current are in the green zone --> no obstacles
+  public static boolean pathInGreenZone(Point start, Point end) {
+    if(start.x <= 4 && end.x <= 4 ) {
+      return true;
+    } return false;
+  }
+  
   public static void turnTo(double angle) {
     Movement.turnBy(minimalAngle(Odometer.getOdometer().getXyt()[2], angle));
   }
@@ -68,20 +121,17 @@ public class Navigation {
     double dist = Math.sqrt(dxSqr + dySqr);
     return dist;
   }
-
   public static double toFeet(double meters) {
     return 3.28084 * meters;
   }
   public static double toMeters(double feet) {
     return feet / 3.28084;
   }
-  
   public static Point getCurrentPoint_feet() {
     double[] xyt = odometer.getXyt();
     Point curPoint = new Point(toFeet(xyt[0]), toFeet(xyt[1]));
     return curPoint;
   }
-  
   public static Point getCurrentPoint_meters() {
     double[] xyt = odometer.getXyt();
     Point curPoint = new Point(xyt[0], xyt[1]);
