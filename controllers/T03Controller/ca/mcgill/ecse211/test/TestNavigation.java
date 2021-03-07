@@ -51,7 +51,20 @@ public class TestNavigation {
   // TODO Think about testing your other Navigation functions here
   // You can add helper methods below to be used in the tests above
   
+ @Test void testToFeet(){
+    assertEquals(3.28084, toFeet(1), ERROR_MARGIN);
+    assertEquals(4.9206, toFeet(1.5), ERROR_MARGIN);
+    assertEquals(32.8084, toFeet(10), ERROR_MARGIN);
+    assertEquals(14.0419952, toFeet(4.28), ERROR_MARGIN);
+    assertEquals(20.46916, toFeet(6.239), ERROR_MARGIN);
+  }
   
-  
+ @Test void testToMeters() {
+   assertEquals(0.30479,toMeters(1), ERROR_MARGIN);
+   assertEquals(1.38989,toMeters(4.56), ERROR_MARGIN);
+   assertEquals(1.6154,toMeters(5.3), ERROR_MARGIN);
+   
+ }
+ 
   
 }
