@@ -145,6 +145,7 @@ public class AvoidObstacle {
     rightMotor.setSpeed(motorSpeeds[RIGHT]);
   }
 
+  
   /**
    * Process a movement based on the US distance passed in (eg, Bang-Bang or Proportional style).
    *

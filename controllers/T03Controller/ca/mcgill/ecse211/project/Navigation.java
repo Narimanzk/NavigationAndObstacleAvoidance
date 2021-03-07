@@ -28,6 +28,7 @@ public class Navigation {
   }
 
   
+  
 
   public static void directTravelTo(Point destination) {
     
