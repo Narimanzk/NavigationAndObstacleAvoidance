@@ -50,7 +50,7 @@ public class Main {
       odometer.printPosition();
     });
     
-    Navigation.directTravelTo(startingPoint); // TODO change this
+    Navigation.directTravelTo(new Point(1,1)); // TODO change this
     Movement.stopMotors();
     
     odometer.printPositionInTileLengths();
@@ -76,5 +76,4 @@ public class Main {
         .collect(Collectors.toUnmodifiableList());
   }
 }
-//
-//}
+

@@ -22,25 +22,25 @@ public class Navigation {
     double angleDiff = Math.abs(destTheta - xyt[2]);
     
     // case 1: we're already at the destination
-    if (travelDist < 0.3) {
+    if (travelDist < 0.1) {
       System.out.println("Already at destination.");
       return;
     }
     
     // case 2 : we're facing the right way and we know there won't be obstacles
-    if ((angleDiff < 6.0 || angleDiff > 354.0)
+    if ((angleDiff < 5.0 || angleDiff > 355.0)
         && (pathInGreenZone(curPoint, destination))) {
       System.out.println("Already Pointing in the right direction, no obstacles ahead.");
       Movement.moveStraightFor(travelDist);
       
       // case 3 : we're facing the right way and there might be obstacles
-    } else if ((angleDiff < 6.0 || angleDiff > 354.0)
+    } else if ((angleDiff < 5.0 || angleDiff > 355.0)
         && (!pathInGreenZone(curPoint, destination))) { 
       System.out.println("Already Pointing in the right direction, might have obstacles ahead.");
       travelToObstacle(destination);
       
       // case 4 : we have to turn and we know there won't be obstacles
-    } else if ((angleDiff >= 6.0 || angleDiff <= 354.0)
+    } else if ((angleDiff >= 5.0 || angleDiff <= 355.0)
         && (pathInGreenZone(curPoint, destination))) {
       System.out.println("Destination has no obstacles ahead.");
       turnTo(destTheta);
@@ -56,25 +56,12 @@ public class Navigation {
     double tolerance = 0.4;
     if (roughlySame(curPoint.x, destination.x, tolerance)
         || roughlySame(curPoint.y, destination.y, tolerance)) {
+      System.out.println("Localizing");
       LightLocalizer.localize_2();
     } else {
-      System.out.println("localize_3()");
+//      LightLocalizer.localizeAngle();
     }
         
-  }
-  
-  /**
-   * Takes two numbers and compare them.
-   * if the difference is less than the tolerance
-   * return true
-   * @param a first number
-   * @param b second number
-   * @param tolerance tolerated difference
-   * @return boolean
-   */
-  public static boolean roughlySame(double a, double b, double tolerance) {
-    double diff = Math.abs(a - b);
-    return (diff < tolerance);
   }
   
   /**
@@ -84,9 +71,9 @@ public class Navigation {
   public static void directTravelTo(Point destination) {
     Point curPoint = getCurrentPoint_feet();
     double travelDist = distanceBetween(curPoint, destination);
-    System.out.println("Distance :" + travelDist);
     Movement.moveStraightFor(toMeters(travelDist));
   }
+
   
   /**
    * Moves forward and when it detects an obstacle calls avoid method.
@@ -99,7 +86,7 @@ public class Navigation {
     while (true) {
       Movement.drive();
       Point cur = getCurrentPoint_feet();
-      if (comparePoints(cur, destination, 1)) {
+      if (comparePoints(cur, destination, 0.2)) {
         System.out.println("Near destination, stop detecting obstacles.");
         break;
       }
@@ -112,8 +99,15 @@ public class Navigation {
         break; 
       }
     }
-    noiseTolerance = 2;
-    directTravelTo(destination); //Travels directly when the obstacle is passed
+//    Movement.stopMotors();
+//    directTravelTo(destination);
+//    travelTo(destination);
+    Point current = getCurrentPoint_feet();
+    if(comparePoints(current, destination, 0.3)) { // if we're within 0.75 square away from the point
+      directTravelTo(destination); //Travels directly when the obstacles is passed
+    }else {
+      travelTo(destination); // otherwise continue with possibility of obstacles.
+    }
   }
   
  
@@ -205,6 +199,20 @@ public class Navigation {
    */
   public static double toMeters(double feet) {
     return feet / 3.28084;
+  }
+  
+  /**
+   * Takes two numbers and compare them.
+   * if the difference is less than the tolerance
+   * return true
+   * @param a first number
+   * @param b second number
+   * @param tolerance tolerated difference
+   * @return boolean
+   */
+  public static boolean roughlySame(double a, double b, double tolerance) {
+    double diff = Math.abs(a - b);
+    return (diff < tolerance);
   }
   
   /**

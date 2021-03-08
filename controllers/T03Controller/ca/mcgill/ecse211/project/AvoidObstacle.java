@@ -22,20 +22,16 @@ public class AvoidObstacle {
   private static boolean notReturningFlag = true;
   private static final double EPSILON = 0.012;
   private static boolean turningRight = false;
-
-  public static int decideLeftRight() {
-    int decision;
-    
-    usMotor.setSpeed(150);
-    usMotor.rotate(-90, false); 
-    usMotor.stop(); 
+  private static int totalMotorRotation = 0;
+  
+  public static int decideLeftRight() {    
+    turnUsMotor(-90);
     int distL = readUsDistance();
     
-    usMotor.setSpeed(150); 
-    usMotor.rotate(180, false); 
-    usMotor.stop(); 
+    turnUsMotor(180);
     int distR = readUsDistance();
     
+    int decision;
     if(distL > distR) {
       System.out.println("Safer to turn left");
       decision = LEFT;
@@ -44,10 +40,8 @@ public class AvoidObstacle {
       decision = RIGHT;
     }
     
-    usMotor.setSpeed(100);
-    usMotor.rotate(-90, false);
-    usMotor.stop();
-    
+
+    turnUsMotor(-90);
     return decision;
   }
   
@@ -79,6 +73,7 @@ public class AvoidObstacle {
       Point curPoint = Navigation.getCurrentPoint_feet();
       if(checkIfPointOnSlope(startPoint, Navigation.getCurrentPoint_feet())) {
         Movement.stopMotors();
+        UsReturnToDefault();
         break;
       }
 //      if(checkIfPointOnSlope(slopeParams[0], slopeParams[1], startPoint, Navigation.getCurrentPoint_feet())) {
@@ -154,28 +149,8 @@ public class AvoidObstacle {
     int leftSpeed = MOTOR_HIGH;
     int rightSpeed = MOTOR_HIGH;
     
-    if (distance > 10 && notReturningFlag) { // initial rotation to give us some leeway with the wall following
-      
-      System.out.println("Correcting==================================================");
-      
-      int motorRotate = 45; 
-      int robotRotate = -70; 
-      
-      if(turningRight) { // values are inverted for a right turn 
-        motorRotate = -45; 
-        robotRotate = 90;
-      }
-      
-      leftMotor.stop();
-      rightMotor.stop();
-      usMotor.setSpeed(100);
-      usMotor.rotate(motorRotate, false); // rotate the sensor by 45 degrees, to see the wall better
-      Movement.turnBy(robotRotate); // rotate the robot too
-      Movement.moveStraightFor(0.04475); // move forward a bit to get some leeway
-      usMotor.rotate(motorRotate, false); // rotate the sensor again by 45, will help see the obstacle better again
-      usMotor.stop();
-      notReturningFlag = false; // once these initial rotations are done, we never do them again
-    }
+    correctController();
+    
     distance_error = turningRight? WALL_DIST_RIGHT - distance : WALL_DIST_LEFT - distance;
 
     //When the sensor detects no obstacles the robot goes straight
@@ -194,6 +169,44 @@ public class AvoidObstacle {
     //      //Sets the speed of left and right motors
     motorSpeeds[LEFT] = leftSpeed;
     motorSpeeds[RIGHT] = rightSpeed;
+  }
+  
+  private static void correctController() {
+    if (distance > 10 && notReturningFlag) {
+      
+      System.out.println("Correcting==================================================");
+      
+      int motorRotate = 45; 
+      int robotRotate = -70; 
+      
+      if(turningRight) {
+        motorRotate = -45; 
+        robotRotate = 90;
+      }
+      
+      leftMotor.stop();
+      rightMotor.stop();
+      turnUsMotor(motorRotate);
+      
+      Movement.turnBy(robotRotate);
+      Movement.moveStraightFor(0.04475);
+      turnUsMotor(motorRotate);
+      
+      notReturningFlag = false;
+    }
+  }
+  
+  
+  public static void turnUsMotor(int amount) {
+    usMotor.setSpeed(100);
+    usMotor.rotate(amount, false);
+    totalMotorRotation += amount; // update global amount to keep track.
+    usMotor.stop();
+  }
+  
+  // return motor to be facing forwards.
+  public static void UsReturnToDefault() {
+    turnUsMotor(-totalMotorRotation);
   }
   
   

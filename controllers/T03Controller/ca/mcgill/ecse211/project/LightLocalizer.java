@@ -2,6 +2,7 @@ package ca.mcgill.ecse211.project;
 
 import static ca.mcgill.ecse211.project.Resources.*;
 import static ca.mcgill.ecse211.project.Movement.*;
+import simlejos.ExecutionController;
 import simlejos.robotics.SampleProvider;
 
 
@@ -37,13 +38,9 @@ public class LightLocalizer {
   }
   
   public static void localize_2() {
-    stepOne();
+    stepOne_2();
     stepTwo_2();
   }
-  
-
-  
-  
   
   
   /**
@@ -55,47 +52,10 @@ public class LightLocalizer {
    * to the black line which intersects (1,1).
    */
   private static void stepOne() {
-    //Moving toward black line
-    leftMotor.forward();
-    rightMotor.forward();
-    
-    // Indicators for if the sensors detect a black line.
-    boolean s1Indicator = false;
-    boolean s2Indicator = false;
-    
-    //First time that the robot pass the black line
-    while (s1Indicator==false || s2Indicator==false) {
-      
-      // If both sensors detect the black line at the same time.
-      if (blackLineTrigger(colorSensor1, sensor1_data) && 
-          blackLineTrigger(colorSensor2, sensor2_data)) {
-        leftMotor.stop();
-        rightMotor.stop();
-        s1Indicator = true;
-        s2Indicator = true;
-        break;
-      }
-      
-      // If The first sensor detects the black line first.
-      if (blackLineTrigger(colorSensor1, sensor1_data)) {
-        rightMotor.stop();
-        s1Indicator = true;
-      }
-      
-      // If the second sensor detects the black line first
-      if (blackLineTrigger(colorSensor2, sensor2_data)) {
-        leftMotor.stop();
-        s2Indicator = true;
-      }
-    }
-    
-    // Prepare the position of the robot to head to (1,1)
+    alignWithLine();
     moveStraightFor(-0.0273);
     turnBy(90.0);
   }
-  
-  
-  
   
   /**
    * Localizes the robot to (1,1,0)
@@ -104,47 +64,81 @@ public class LightLocalizer {
    * to place the robot at (1,1,0) with reference to the odometer.
    */
   private static void stepTwo() {
-    
-    // Indicators for if the sensors detect a black line.
-    boolean s1Indicator = false;
-    boolean s2Indicator = false;
-    
-    while (s1Indicator==false || s2Indicator==false) {   
-      leftMotor.setSpeed(FORWARD_SPEED);
-      rightMotor.setSpeed(FORWARD_SPEED);
-      leftMotor.forward();
-      rightMotor.forward();      
-      
-      //When it reaches (1,1) with both sensors at the same time
-      if (blackLineTrigger(colorSensor1, sensor1_data)
-          && blackLineTrigger(colorSensor2, sensor2_data)) {
-        leftMotor.stop();
-        rightMotor.stop();
-        s1Indicator = true;
-        s2Indicator = true;
-        break;
-      } 
-
-      //When it reaches (1,1) with sensor1 first
-      if (blackLineTrigger(colorSensor1, sensor1_data)) {
-        rightMotor.stop();
-        s1Indicator = true;
-      }
-      
-      //When it reaches (1,1) with sensor2 first
-      if (blackLineTrigger(colorSensor2, sensor2_data)) {
-        leftMotor.stop();
-        s2Indicator = true;
-      }
-    }
-    
-    // correct the position to (1,1,0).
+    alignWithLine();
     moveStraightFor(-0.0273 * 3.5);
     turnBy(-90.0);
   }
   
+  private static void stepOne_2() {
+    alignWithLine();
+    moveStraightFor(-0.0273 * 3.5);
+    turnBy(90.0);
+  }
   
   private static void stepTwo_2() {
+    alignWithLine();
+    moveStraightFor(-0.0273 * 3.5);
+  }
+  
+  public static void localizeAngle() {
+    reAlign();
+    reOrientate();
+  }
+  
+  private static void reAlign() {
+    int first = 0;
+    while(first==0) {
+      leftMotor.setSpeed(FORWARD_SPEED);
+      rightMotor.setSpeed(FORWARD_SPEED);
+      leftMotor.forward();
+      rightMotor.forward(); 
+      if (blackLineTrigger(colorSensor1, sensor1_data)) {
+        System.out.println("Stopping sensor 1");
+        rightMotor.stop();
+        first = 1;
+        break;
+      }
+      if (blackLineTrigger(colorSensor2, sensor2_data)) {
+        System.out.println("Stopping sensor 2");
+        leftMotor.stop();
+        first = 2;
+        break;
+      }
+    }
+    
+    int stopSecond = 0;
+    if(first==2) {
+      while(stopSecond < 2) {
+        if (blackLineTrigger(colorSensor2, sensor2_data)) {
+          stopSecond++;
+          System.out.println("stopSecond = "+stopSecond);
+          pause();
+        }
+      }
+      leftMotor.stop();
+    }else{
+      while(stopSecond < 2) {
+        if (blackLineTrigger(colorSensor1, sensor1_data)) {
+          stopSecond++;
+          System.out.println("stopSecond = "+stopSecond);
+          pause();
+        }
+      }
+      rightMotor.stop();
+    }
+    
+    moveStraightFor(-0.0273);
+    turnBy(-90.0);
+  }
+  
+  private static void reOrientate() {
+    alignWithLine();
+    moveStraightFor(-0.0273 * 3.5);
+  }
+  
+  
+  
+  private static void alignWithLine() {
     // Indicators for if the sensors detect a black line.
     boolean s1Indicator = false;
     boolean s2Indicator = false;
@@ -154,16 +148,6 @@ public class LightLocalizer {
       rightMotor.setSpeed(FORWARD_SPEED);
       leftMotor.forward();
       rightMotor.forward();      
-      
-      //When it reaches (1,1) with both sensors at the same time
-      if (blackLineTrigger(colorSensor1, sensor1_data)
-          && blackLineTrigger(colorSensor2, sensor2_data)) {
-        leftMotor.stop();
-        rightMotor.stop();
-        s1Indicator = true;
-        s2Indicator = true;
-        break;
-      } 
 
       //When it reaches (1,1) with sensor1 first
       if (blackLineTrigger(colorSensor1, sensor1_data)) {
@@ -177,14 +161,7 @@ public class LightLocalizer {
         s2Indicator = true;
       }
     }
-    
-    // correct the position to (1,1,0).
-    moveStraightFor(-0.0273 * 3.5);
-//    turnBy(-90.0);
   }
-  
-  
-  
   
   
   
@@ -209,6 +186,34 @@ public class LightLocalizer {
     }
   }
   
+  
+  public static void continueUntilLine() {
+    leftMotor.setSpeed(FORWARD_SPEED);
+    rightMotor.setSpeed(FORWARD_SPEED);
+    while(true) {
+      leftMotor.forward();
+      rightMotor.forward();
+      if (blackLineTrigger(colorSensor1, sensor1_data)) {
+        rightMotor.stop();
+        leftMotor.stop();
+        break;
+      }
+    }
+  }
+  
+  
+  private static void pause() {
+    System.out.println("Pause");
+    leftMotor.setSpeed(0);
+    rightMotor.setSpeed(0);
+    
+    for (int i = 0; i < 3000; i++) {
+      ExecutionController.waitUntilNextStep();
+    }
+    
+    leftMotor.setSpeed(FORWARD_SPEED);
+    rightMotor.setSpeed(FORWARD_SPEED);
+  }
   
 
 }

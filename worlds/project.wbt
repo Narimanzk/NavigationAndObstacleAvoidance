@@ -14,8 +14,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.10466564361365234 0.10080127785536543 0.9893857717946349 1.543850658947739
-  position 2.346441749190509 1.13815010553221 3.3609823595807495
+  orientation 0.1016038369986507 0.10083345617517513 0.9897016087806065 1.573537016823404
+  position 2.2997434123248226 1.219025824474339 4.707698011032598
 }
 DPM-Floor {
   dimension 8 8
@@ -41,12 +41,12 @@ DPM-Floor {
 }
 DPM-Obstacle {
   name "obstacle1"
-  position 2.1 1.2
+  position 2.1 0.7
   sections 4
 }
 DPM-Obstacle {
   name "obstacle2"
-  position 3 1.5
+  position 2.1 1.6
   sections 4
 }
 DPM-Obstacle {
