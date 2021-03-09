@@ -1,7 +1,8 @@
 package ca.mcgill.ecse211.project;
 
-import static ca.mcgill.ecse211.project.Resources.*;
 import static ca.mcgill.ecse211.project.Movement.*;
+import static ca.mcgill.ecse211.project.Resources.*;
+
 import simlejos.ExecutionController;
 import simlejos.robotics.SampleProvider;
 
@@ -24,7 +25,7 @@ public class LightLocalizer {
   /** Buffer (array) to store US2 samples. */
   private static float[] sensor2_data = new float[colorSensor2.sampleSize()];
   
-  /** Values to operate color sensor */
+  /** Values to operate color sensor. */
   private static int current_color_blue = 1000;
   private static int current_color_red = 1000;
   
@@ -37,6 +38,9 @@ public class LightLocalizer {
     stepTwo();  // Moving toward (1,1)
   }
   
+  /**
+   * A modified version of localization using at waypoints.
+   */
   public static void localize_2() {
     stepOne_2();
     stepTwo_2();
@@ -69,25 +73,39 @@ public class LightLocalizer {
     turnBy(-90.0);
   }
   
+  /**
+   * A modified version of stepOne using at waypoints.
+   * Modified the position of the robot
+   */
   private static void stepOne_2() {
     alignWithLine();
     moveStraightFor(-0.0273 * 3.5);
     turnBy(90.0);
   }
   
+  /**
+   * A modified version of stepTwo.
+   * The robot will not turn in the modified version.
+   */
   private static void stepTwo_2() {
     alignWithLine();
     moveStraightFor(-0.0273 * 3.5);
   }
   
+  /**
+   * align and orient the robot with a line.
+   */
   public static void localizeAngle() {
     reAlign();
     reOrientate();
   }
   
+  /**
+   * align the robot with the black line.
+   */
   private static void reAlign() {
     int first = 0;
-    while(first==0) {
+    while (first == 0) {
       leftMotor.setSpeed(FORWARD_SPEED);
       rightMotor.setSpeed(FORWARD_SPEED);
       leftMotor.forward();
@@ -107,20 +125,20 @@ public class LightLocalizer {
     }
     
     int stopSecond = 0;
-    if(first==2) {
-      while(stopSecond < 2) {
+    if (first == 2) {
+      while (stopSecond < 2) {
         if (blackLineTrigger(colorSensor2, sensor2_data)) {
           stopSecond++;
-          System.out.println("stopSecond = "+stopSecond);
+          System.out.println("stopSecond = " + stopSecond);
           pause();
         }
       }
       leftMotor.stop();
-    }else{
-      while(stopSecond < 2) {
+    } else {
+      while (stopSecond < 2) {
         if (blackLineTrigger(colorSensor1, sensor1_data)) {
           stopSecond++;
-          System.out.println("stopSecond = "+stopSecond);
+          System.out.println("stopSecond = " + stopSecond);
           pause();
         }
       }
@@ -136,13 +154,15 @@ public class LightLocalizer {
     moveStraightFor(-0.0273 * 3.5);
   }
   
-  
+  /**
+   * align the robot with the line at (1,1).
+   */
   private static void alignWithLine() {
     // Indicators for if the sensors detect a black line.
     boolean s1Indicator = false;
     boolean s2Indicator = false;
     
-    while (s1Indicator==false || s2Indicator==false) {   
+    while (s1Indicator == false || s2Indicator == false) {   
       leftMotor.setSpeed(FORWARD_SPEED);
       rightMotor.setSpeed(FORWARD_SPEED);
       leftMotor.forward();
@@ -170,7 +190,8 @@ public class LightLocalizer {
    * robot has traveled over a black line.
    * Method makes use of a fixed threshold value which may not be reliable in
    * certain conditions, however it has been tested and conditioned to minimize false negatives.
-   * @param the color sensor and the data recorded by the color sensor
+   * @param colorSensor the color sensor
+   * @param sensor the data recorded by the color sensor
    * @return true if black line is detected by both sensors.
    */
   public static boolean blackLineTrigger(SampleProvider colorSensor, float[] sensor) {
@@ -185,11 +206,13 @@ public class LightLocalizer {
     }
   }
   
-  
+  /**
+   * drives until black line is detected by sensor one.
+   */
   public static void continueUntilLine() {
     leftMotor.setSpeed(FORWARD_SPEED);
     rightMotor.setSpeed(FORWARD_SPEED);
-    while(true) {
+    while (true) {
       leftMotor.forward();
       rightMotor.forward();
       if (blackLineTrigger(colorSensor1, sensor1_data)) {
@@ -200,7 +223,9 @@ public class LightLocalizer {
     }
   }
   
-  
+  /**
+   * stops the robot and pauses.
+   */
   private static void pause() {
     System.out.println("Pause");
     leftMotor.setSpeed(0);
