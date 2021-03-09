@@ -7,7 +7,7 @@ import simlejos.ExecutionController;
 
 public class AvoidObstacle {
   public static final int WALL_DIST_LEFT = 13;
-  public static final int WALL_DIST_RIGHT = 10; 
+  public static final int WALL_DIST_RIGHT = 10;
   public static final int WALL_DIST_ERR_THRESH = 0;
   private static int[] motorSpeeds = new int[2];
   private static final int LEFT = 0;
@@ -24,7 +24,7 @@ public class AvoidObstacle {
   private static boolean turningRight = false;
   private static int totalMotorRotation = 0;
   
-  public static int decideLeftRight() {    
+  public static int decideLeftRight() { 
     turnUsMotor(-90);
     int distL = readUsDistance();
     
@@ -40,7 +40,6 @@ public class AvoidObstacle {
       decision = RIGHT;
     }
     
-
     turnUsMotor(-90);
     return decision;
   }
@@ -89,11 +88,11 @@ public class AvoidObstacle {
   }
   
   private static double[] getLinearSlope(Point p1, Point p2) {
-    System.out.println("Getting linear slope");
-    System.out.println("P1 : ("+p1.x+","+p1.y+")");
-    System.out.println("P2 : ("+p2.x+","+p2.y+")");
+//    System.out.println("Getting linear slope");
+//    System.out.println("P1 : ("+p1.x+","+p1.y+")");
+//    System.out.println("P2 : ("+p2.x+","+p2.y+")");
     double m;
-    if(compareRoughly(p1.x, p2.x, 0.9) || compareRoughly(p1.y, p2.y, 0.9)) {
+    if(compareRoughly(p1.x, p2.x, 0.8) || compareRoughly(p1.y, p2.y, 0.8)) {
       m = 0;
     } else {
       m = (p2.y - p1.y) / (p2.x - p1.x);
@@ -118,18 +117,20 @@ public class AvoidObstacle {
 //    }
 //  }
   
-  private static boolean distIndicator(Point start, Point curr) {
-    double distance = Navigation.distanceBetween(start, curr);
-    if(distance > 0.5) {
-      return true;
-    } return false;
-  }
+
 
   private static boolean checkIfPointOnSlope(Point start, Point curr) {
     double xDiff = Math.abs(start.x - curr.x);
     double yDiff = Math.abs(start.y - curr.y);
     boolean dist = distIndicator(start, curr);
     return((xDiff < EPSILON && !notReturningFlag && dist) || (yDiff < EPSILON && !notReturningFlag && dist));
+  }
+  
+  private static boolean distIndicator(Point start, Point curr) {
+    double distance = Navigation.distanceBetween(start, curr);
+    if(distance > 0.5) {
+      return true;
+    } return false;
   }
 
   /** Sets the speeds of the left and right motors from the motorSpeeds array. */
@@ -173,9 +174,7 @@ public class AvoidObstacle {
   
   private static void correctController() {
     if (distance > 10 && notReturningFlag) {
-      
-      System.out.println("Correcting==================================================");
-      
+            
       int motorRotate = 45; 
       int robotRotate = -70; 
       

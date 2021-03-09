@@ -14,9 +14,6 @@ import java.util.Arrays;
 import simlejos.ExecutionController;
 
 public class Movement {
-//  private static float[] usData = new float[usSensor.sampleSize()];
-
-  
   
   /**
    * Converts input distance to the total rotation of each wheel needed to cover that distance.
@@ -89,13 +86,5 @@ public class Movement {
     rightMotor.forward();
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
   
 }

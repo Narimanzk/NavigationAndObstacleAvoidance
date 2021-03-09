@@ -5,6 +5,7 @@ import static ca.mcgill.ecse211.project.Resources.*;
 import ca.mcgill.ecse211.playingfield.Point;
 
 public class Navigation {
+  static int a = 0;
   
   private Navigation() {}
   
@@ -15,33 +16,33 @@ public class Navigation {
    * @param destination the destination point
    */
   public static void travelTo(Point destination) {
-    Point curPoint = getCurrentPoint_feet();
-    double travelDist = toMeters(distanceBetween(curPoint, destination));
-    double destTheta = getDestinationAngle(curPoint, destination);
+    Point startPoint = getCurrentPoint_feet();
+    double travelDist = toMeters(distanceBetween(startPoint, destination));
+    double destTheta = getDestinationAngle(startPoint, destination);
     double[] xyt = odometer.getXyt();
     double angleDiff = Math.abs(destTheta - xyt[2]);
     
     // case 1: we're already at the destination
-    if (travelDist < 0.1) {
+    if (travelDist < 0.2) {
       System.out.println("Already at destination.");
       return;
     }
     
     // case 2 : we're facing the right way and we know there won't be obstacles
     if ((angleDiff < 5.0 || angleDiff > 355.0)
-        && (pathInGreenZone(curPoint, destination))) {
+        && (pathInGreenZone(startPoint, destination))) {
       System.out.println("Already Pointing in the right direction, no obstacles ahead.");
       Movement.moveStraightFor(travelDist);
       
       // case 3 : we're facing the right way and there might be obstacles
     } else if ((angleDiff < 5.0 || angleDiff > 355.0)
-        && (!pathInGreenZone(curPoint, destination))) { 
+        && (!pathInGreenZone(startPoint, destination))) {
       System.out.println("Already Pointing in the right direction, might have obstacles ahead.");
       travelToObstacle(destination);
       
       // case 4 : we have to turn and we know there won't be obstacles
     } else if ((angleDiff >= 5.0 || angleDiff <= 355.0)
-        && (pathInGreenZone(curPoint, destination))) {
+        && (pathInGreenZone(startPoint, destination))) {
       System.out.println("Destination has no obstacles ahead.");
       turnTo(destTheta);
       Movement.moveStraightFor(travelDist);
@@ -54,15 +55,17 @@ public class Navigation {
     }
     
     double tolerance = 0.4;
-    if (roughlySame(curPoint.x, destination.x, tolerance)
-        || roughlySame(curPoint.y, destination.y, tolerance)) {
-      System.out.println("Localizing");
+    if ((roughlySame(startPoint.x, destination.x, tolerance)
+        || roughlySame(startPoint.y, destination.y, tolerance))
+        && a < 2
+        ) {
+      a++;
       LightLocalizer.localize_2();
-    } else {
-//      LightLocalizer.localizeAngle();
     }
-        
   }
+  
+  
+  
   
   /**
    * Takes a point and moves directly toward it.
@@ -94,20 +97,20 @@ public class Navigation {
         noiseTolerance--;
       }
       if (noiseTolerance == 0) {
-        Point startPoint = new Point(odometer.getXyt()[0] / 0.3048, odometer.getXyt()[1] / 0.3048); 
+        Point startPoint = getCurrentPoint_feet();
         AvoidObstacle.avoid(startPoint, destination);
         break; 
       }
     }
-//    Movement.stopMotors();
-//    directTravelTo(destination);
-//    travelTo(destination);
-    Point current = getCurrentPoint_feet();
-    if(comparePoints(current, destination, 0.3)) { // if we're within 0.75 square away from the point
-      directTravelTo(destination); //Travels directly when the obstacles is passed
+    Point c = getCurrentPoint_feet();
+    System.out.println("Currently at ("+c.x+","+c.y+")\tTravelling to ("+destination.x+","+destination.y+")\t Distance = "+distanceBetween(c,destination));
+    
+    if(distanceBetween(c,destination) < 0.5) {
+      directTravelTo(destination);
     }else {
-      travelTo(destination); // otherwise continue with possibility of obstacles.
+      travelTo(destination);
     }
+    
   }
   
  
