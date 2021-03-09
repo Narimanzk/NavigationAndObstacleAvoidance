@@ -57,7 +57,6 @@ public class Movement {
   }
   
   
-  
   /**
    * Converts input angle to the total rotation of each wheel needed to rotate the robot by that
    * angle.

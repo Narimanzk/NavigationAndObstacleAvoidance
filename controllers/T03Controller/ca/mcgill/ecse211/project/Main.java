@@ -39,7 +39,6 @@ public class Main {
     LightLocalizer.localize();
     System.out.println("Done localizing");
     odometer.printPosition();
-    
 
     
     

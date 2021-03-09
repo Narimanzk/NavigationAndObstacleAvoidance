@@ -137,8 +137,6 @@ public class LightLocalizer {
   }
   
   
-  
-  
   private static void alignWithLine() {
     // Indicators for if the sensors detect a black line.
     boolean s1Indicator = false;

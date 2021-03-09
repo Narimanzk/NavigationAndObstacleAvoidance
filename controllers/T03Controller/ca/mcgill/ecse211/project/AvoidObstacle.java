@@ -208,7 +208,6 @@ public class AvoidObstacle {
     turnUsMotor(-totalMotorRotation);
   }
   
-  
 
   /** Returns the filtered distance between the US sensor and an obstacle in cm. */
   public static int readUsDistance() {
