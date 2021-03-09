@@ -70,18 +70,27 @@ public class Movement {
   }
   
   
-  // ====================================================================
+  /**
+   * sets the speed of the motors.
+   * @param speed speed amount
+   */
   public static void setMotorSpeeds(int speed) {
     leftMotor.setSpeed(speed);
     rightMotor.setSpeed(speed);
   }
   
+  /**
+   * Stops the motors.
+   */
   public static void stopMotors() {
     leftMotor.stop();
     rightMotor.stop();
   }
   
-  public static void drive() { // Called in AvoidObstacle do not remove!!
+  /**
+   * the robot goes forward.
+   */
+  public static void drive() { 
     leftMotor.forward();
     rightMotor.forward();
   }

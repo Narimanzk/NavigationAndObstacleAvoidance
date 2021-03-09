@@ -7,14 +7,9 @@ import java.io.IOException;
 import java.lang.Thread;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import simlejos.ExecutionController;
-
-import ca.mcgill.ecse211.project.Navigation.*;
-
-
 
 
 /**
