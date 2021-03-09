@@ -195,6 +195,7 @@ public class Navigation {
     return 3.28084 * meters;
   }
   
+  
   /**
    * Converts feet to meters.
    * @param feet distance in feet

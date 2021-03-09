@@ -220,6 +220,7 @@ public class AvoidObstacle {
     }
     return filter(filterArr);
   }
+  
 
   /**
    * Rudimentary filter - toss out invalid samples corresponding to null signal.
