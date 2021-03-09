@@ -63,7 +63,7 @@ public class AvoidObstacle {
     
     double[] params = getLinearSlope(startPoint, endPoint);
     
-    wallFollow(params, startPoint);
+    wallFollow(params, startPoint, endPoint);
     Navigation.turnTo(initialAngle);
     
     notReturningFlag = true;
@@ -75,11 +75,11 @@ public class AvoidObstacle {
    * the direction which is further from the wall
    * @return decision going left or right
    */
-  public static int decideLeftRight() { 
-    turnUsMotor(-90);
+  public static int decideLeftRight() { // TODO: Verify this decision with a 90 degree turn
+    turnUsMotor(-70);
     int distL = readUsDistance();
     
-    turnUsMotor(180);
+    turnUsMotor(140);
     int distR = readUsDistance();
     
     int decision;
@@ -91,7 +91,7 @@ public class AvoidObstacle {
       decision = RIGHT;
     }
     
-    turnUsMotor(-90);
+    turnUsMotor(-70);
     return decision;
   }
   
@@ -101,19 +101,68 @@ public class AvoidObstacle {
    * @param slopeParams the slope and y-intercept of the path
    * @param startPoint the point before starting the obstacle avoidance
    */
-  public static void wallFollow(double[] slopeParams, Point startPoint) {
+  public static void wallFollow(double[] slopeParams, Point startPoint, Point endPoint) {
     System.out.println("m = " + slopeParams[0] + "\tb = " + slopeParams[1]);
     while (true) {
       controller(readUsDistance(), motorSpeeds);
       setMotorSpeeds();
       Movement.drive();
       Point curPoint = Navigation.getCurrentPoint_feet();
-      if (checkIfPointOnSlope(startPoint, Navigation.getCurrentPoint_feet())) {
+      if(checkIfPointOnSlope(startPoint, curPoint, slopeParams)) {
         Movement.stopMotors();
         usReturnToDefault();
         break;
       }
+//      if (checkIfPointOnSlope(startPoint, Navigation.getCurrentPoint_feet())) {
+//        Movement.stopMotors();
+//        usReturnToDefault();
+//        break;
+//      }
     }
+  }
+  
+  /**
+   * Checking if the robot joined back the path.
+   * @param start starting point before going off the path
+   * @param curr the current position of the robot
+   * @return true if it is back to the path
+   */
+  private static boolean checkIfPointOnSlope(Point start, Point curr, double[] params) {
+    // y = mx + b;
+    double m = params[0];
+    if(m==0) {
+      double xdiff = Math.abs(start.x - curr.x);
+      double ydiff = Math.abs(start.y - curr.y);
+      boolean dist = distIndicator(start, curr);
+      return ((xdiff < EPSILON && !notReturningFlag && dist)
+          || (ydiff < EPSILON && !notReturningFlag && dist));
+    }else {
+      double curX = curr.x;
+      double curY = curr.y;
+      double newM = (curY - start.y) / (curX - start.x);
+      // System.out.println("y = "+curY+"\tx = "+curX+"\t\tcalcY = "+calcY+"\tcalcX = "+calcX+"\t\tnewM = "+newM+"\tb = "+newB);
+      return (compareRoughly(newM, m, 0.09));
+    }
+  }
+
+
+
+  /**
+   * Measure the linear slope between two points.
+   * @param p1 first point
+   * @param p2 second point
+   * @return params has the slope and y-intercept
+   */
+  private static double[] getLinearSlope(Point p1, Point p2) {
+    double m;
+    if (compareRoughly(p1.x, p2.x, 0.7) || compareRoughly(p1.y, p2.y, 0.7)) {
+      m = 0;
+    } else {
+      m = (p2.y - p1.y) / (p2.x - p1.x);
+    }
+    double b = p1.y - m * (p2.x);
+    double[] params = {m, b};
+    return params;
   }
   
   /**
@@ -125,39 +174,8 @@ public class AvoidObstacle {
    */
   private static boolean compareRoughly(double a, double b, double margin) {
     double diff = Math.abs(a - b);
+//    System.out.println(diff+" = "+a+" - "+b);
     return (diff < margin); // if they're close enough return true
-  }
-  
-  /**
-   * Measure the linear slope between two points.
-   * @param p1 first point
-   * @param p2 second point
-   * @return params has the slope and y-intercept
-   */
-  private static double[] getLinearSlope(Point p1, Point p2) {
-    double m;
-    if (compareRoughly(p1.x, p2.x, 0.8) || compareRoughly(p1.y, p2.y, 0.8)) {
-      m = 0;
-    } else {
-      m = (p2.y - p1.y) / (p2.x - p1.x);
-    }
-    double b = p1.y - m * (p2.x);
-    double[] params = {m, b};
-    return params;
-  }
-  
-  /**
-   * Checking if the robot joined back the path.
-   * @param start starting point before going off the path
-   * @param curr the current position of the robot
-   * @return true if it is back to the path
-   */
-  private static boolean checkIfPointOnSlope(Point start, Point curr) {
-    double xdiff = Math.abs(start.x - curr.x);
-    double ydiff = Math.abs(start.y - curr.y);
-    boolean dist = distIndicator(start, curr);
-    return ((xdiff < EPSILON && !notReturningFlag && dist)
-        || (ydiff < EPSILON && !notReturningFlag && dist));
   }
   
   /**
@@ -168,7 +186,7 @@ public class AvoidObstacle {
    */
   private static boolean distIndicator(Point start, Point curr) {
     double distance = Navigation.distanceBetween(start, curr);
-    if (distance > 0.5) {
+    if (distance > 1.5) {
       return true;
     }
     return false;
@@ -210,7 +228,7 @@ public class AvoidObstacle {
       rightSpeed = turningRight ? MOTOR_HIGH + MOTOR_LOW : MOTOR_LOW;
       leftSpeed = turningRight ? MOTOR_LOW : MOTOR_HIGH + MOTOR_LOW;
     }
-    //      //Sets the speed of left and right motors
+    //Sets the speed of left and right motors
     motorSpeeds[LEFT] = leftSpeed;
     motorSpeeds[RIGHT] = rightSpeed;
   }
@@ -226,7 +244,7 @@ public class AvoidObstacle {
       
       if (turningRight) {
         motorRotate = -45; 
-        robotRotate = 90;
+        robotRotate = 70;
       }
       
       leftMotor.stop();
@@ -234,7 +252,7 @@ public class AvoidObstacle {
       turnUsMotor(motorRotate);
       
       Movement.turnBy(robotRotate);
-      Movement.moveStraightFor(0.04475);
+      Movement.moveStraightFor(0.06475);
       turnUsMotor(motorRotate);
       
       notReturningFlag = false;
