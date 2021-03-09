@@ -103,11 +103,13 @@ public class Navigation {
       }
     }
     Point c = getCurrentPoint_feet();
-    System.out.println("Currently at ("+c.x+","+c.y+")\tTravelling to ("+destination.x+","+destination.y+")\t Distance = "+distanceBetween(c,destination));
+    System.out.println("Currently at (" + c.x + "," + c.y
+        + ")\tTravelling to (" + destination.x + "," + destination.y
+        + ")\t Distance = " + distanceBetween(c, destination));
     
-    if(distanceBetween(c,destination) < 0.5) {
+    if (distanceBetween(c, destination) < 0.5) {
       directTravelTo(destination);
-    }else {
+    } else {
       travelTo(destination);
     }
     
@@ -118,7 +120,7 @@ public class Navigation {
    * Checks if the path between two points is in the green zone(no obstacles).
    * @param start Starting point
    * @param end Ending point
-   * @return boolean
+   * @return true if it is in green zone
    */
   public static boolean pathInGreenZone(Point start, Point end) {
     if (start.x <= 4 && end.x <= 4) {
@@ -139,7 +141,7 @@ public class Navigation {
    * Gets the angle to the destination point.
    * @param current Current position of the robot
    * @param destination Destination point
-   * @return double
+   * @return the destination angle
    */
   public static double getDestinationAngle(Point current, Point destination) {
     return (Math.toDegrees(
@@ -150,7 +152,7 @@ public class Navigation {
    * Calculates the minimal angle to turn.
    * @param initialAngle initial angle of the robot
    * @param destAngle destination angle
-   * @return double
+   * @return toTurn the minimal angle
    */
   public static double minimalAngle(double initialAngle, double destAngle) {
     initialAngle %= 360;
@@ -163,7 +165,7 @@ public class Navigation {
    * Calculates the distance between two points.
    * @param p1  First point
    * @param p2  Second point
-   * @return double
+   * @return dist distance
    */
   public static double distanceBetween(Point p1, Point p2) {
     double dxSqr = Math.pow((p2.x - p1.x), 2);
@@ -179,7 +181,7 @@ public class Navigation {
    * @param cur Current point
    * @param destination Destination point
    * @param tolerance Tolerated difference
-   * @return boolean
+   * @return true if points are the close
    */
   public static boolean comparePoints(Point cur, Point destination, double tolerance) {
     double distCurDest = distanceBetween(cur, destination);
@@ -189,7 +191,7 @@ public class Navigation {
   /**
    * Converts meters to feet.
    * @param meters distance in meter
-   * @return double
+   * @return feet unit
    */
   public static double toFeet(double meters) {
     return 3.28084 * meters;
@@ -200,7 +202,7 @@ public class Navigation {
   /**
    * Converts feet to meters.
    * @param feet distance in feet
-   * @return double
+   * @return meter unit
    */
   public static double toMeters(double feet) {
     return feet / 3.28084;
@@ -213,7 +215,7 @@ public class Navigation {
    * @param a first number
    * @param b second number
    * @param tolerance tolerated difference
-   * @return boolean
+   * @return true if the values are roughly the same
    */
   public static boolean roughlySame(double a, double b, double tolerance) {
     double diff = Math.abs(a - b);
@@ -222,7 +224,7 @@ public class Navigation {
   
   /**
    * gets the current point from odometer in feet.
-   * @return Point
+   * @return Point in feet unit
    */
   public static Point getCurrentPoint_feet() {
     double[] xyt = odometer.getXyt();
@@ -232,7 +234,7 @@ public class Navigation {
   
   /**
    * gets the current point from odometer in meters.
-   * @return Point
+   * @return Point in meter unit
    */
   public static Point getCurrentPoint_meters() {
     double[] xyt = odometer.getXyt();
