@@ -147,7 +147,7 @@ public class AvoidObstacle {
   }
   
   /**
-   * Checking if the robot joined back the path
+   * Checking if the robot joined back the path.
    * @param start starting point before going off the path
    * @param curr the current position of the robot
    * @return true if it is back to the path
