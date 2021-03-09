@@ -108,16 +108,11 @@ public class AvoidObstacle {
       setMotorSpeeds();
       Movement.drive();
       Point curPoint = Navigation.getCurrentPoint_feet();
-      if(checkIfPointOnSlope(startPoint, curPoint, slopeParams)) {
+      if (checkIfPointOnSlope(startPoint, curPoint, slopeParams)) {
         Movement.stopMotors();
         usReturnToDefault();
         break;
       }
-//      if (checkIfPointOnSlope(startPoint, Navigation.getCurrentPoint_feet())) {
-//        Movement.stopMotors();
-//        usReturnToDefault();
-//        break;
-//      }
     }
   }
   
@@ -130,17 +125,16 @@ public class AvoidObstacle {
   private static boolean checkIfPointOnSlope(Point start, Point curr, double[] params) {
     // y = mx + b;
     double m = params[0];
-    if(m==0) {
+    if (m == 0) {
       double xdiff = Math.abs(start.x - curr.x);
       double ydiff = Math.abs(start.y - curr.y);
       boolean dist = distIndicator(start, curr);
       return ((xdiff < EPSILON && !notReturningFlag && dist)
           || (ydiff < EPSILON && !notReturningFlag && dist));
-    }else {
+    } else {
       double curX = curr.x;
       double curY = curr.y;
       double newM = (curY - start.y) / (curX - start.x);
-      // System.out.println("y = "+curY+"\tx = "+curX+"\t\tcalcY = "+calcY+"\tcalcX = "+calcX+"\t\tnewM = "+newM+"\tb = "+newB);
       return (compareRoughly(newM, m, 0.09));
     }
   }
@@ -174,7 +168,6 @@ public class AvoidObstacle {
    */
   private static boolean compareRoughly(double a, double b, double margin) {
     double diff = Math.abs(a - b);
-//    System.out.println(diff+" = "+a+" - "+b);
     return (diff < margin); // if they're close enough return true
   }
   
