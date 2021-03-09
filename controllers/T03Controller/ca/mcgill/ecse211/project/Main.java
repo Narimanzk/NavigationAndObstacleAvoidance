@@ -44,7 +44,7 @@ public class Main {
       odometer.printPosition();
     });
     
-    Navigation.directTravelTo(new Point(1,1)); // TODO change this
+    Navigation.directTravelTo(waypoints.get(1));
     Movement.stopMotors();
     
     odometer.printPositionInTileLengths();
