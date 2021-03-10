@@ -3,6 +3,7 @@ package ca.mcgill.ecse211.project;
 import static ca.mcgill.ecse211.project.Resources.*;
 
 import ca.mcgill.ecse211.playingfield.Point;
+import simlejos.ExecutionController;
 
 public class Navigation {
   static int a = 0;
@@ -41,9 +42,9 @@ public class Navigation {
       travelToObstacle(destination);
       
       // case 4 : we have to turn and we know there won't be obstacles
-    } else if ((angleDiff >= 5.0 || angleDiff <= 355.0)
+    } else if ((angleDiff >= 9.0 || angleDiff <= 351.0)
         && (pathInGreenZone(startPoint, destination))) {
-      System.out.println("Destination has no obstacles ahead.");
+      System.out.println("Destination has no obstacles ahead. Anglediff = "+angleDiff+" "+destTheta+" "+xyt[2]+".");
       turnTo(destTheta);
       Movement.moveStraightFor(travelDist);
       
@@ -57,11 +58,16 @@ public class Navigation {
     double tolerance = 0.4;
     if ((roughlySame(startPoint.x, destination.x, tolerance)
         || roughlySame(startPoint.y, destination.y, tolerance))
-        && a < 2
+        && a < 4
         ) {
       a++;
       LightLocalizer.localize_2();
     }
+    odometer.setX(toMeters(destination.x));
+    odometer.setY(toMeters(destination.y));
+//    odometer.setTheta(getDestinationAngle(destTheta+90));
+//    odometer.setXyt(destination.x, destination.y, 0);
+    pause();
   }
   
   
@@ -93,7 +99,7 @@ public class Navigation {
         System.out.println("Near destination, stop detecting obstacles.");
         break;
       }
-      if (AvoidObstacle.readUsDistance() < 12) {
+      if (AvoidObstacle.readUsDistance() < 11) {
         noiseTolerance--;
       }
       if (noiseTolerance == 0) {
@@ -241,6 +247,31 @@ public class Navigation {
     Point curPoint = new Point(xyt[0], xyt[1]);
     return curPoint;
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // TODO : REMOVE
+  private static void pause() {
+    System.out.println("Pause");
+    leftMotor.setSpeed(0);
+    rightMotor.setSpeed(0);
+    
+    for (int i = 0; i < 3000; i++) {
+      ExecutionController.waitUntilNextStep();
+    }
+    
+    leftMotor.setSpeed(FORWARD_SPEED);
+    rightMotor.setSpeed(FORWARD_SPEED);
+  }
+  
+  
   
   
 }

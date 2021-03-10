@@ -41,17 +41,17 @@ DPM-Floor {
 }
 DPM-Obstacle {
   name "obstacle1"
-  position 2.15 0.7
+  position 2.13 1.22
   sections 4
 }
 DPM-Obstacle {
   name "obstacle2"
-  position 2.15 1.55
+  position 1.52 0.305
   sections 4
 }
 DPM-Obstacle {
   name "obstacle3"
-  position 1.62 1.8
+  position -0.5 -0.5
   sections 4
 }
 TexturedBackground {
