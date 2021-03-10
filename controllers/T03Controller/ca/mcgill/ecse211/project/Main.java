@@ -35,7 +35,12 @@ public class Main {
     LightLocalizer.localize();
     System.out.println("Done localizing");
     
-    odometer.setXyt(1 * TILE_SIZE, 7 * TILE_SIZE, 90);
+    var firstPoint = waypoints.get(1);
+    if(firstPoint.y==1) {
+      odometer.setXyt(firstPoint.x * TILE_SIZE, firstPoint.y * TILE_SIZE, 0);
+    }else{
+      odometer.setXyt(firstPoint.x * TILE_SIZE, firstPoint.y * TILE_SIZE, 90);
+    }
 
     odometer.printPosition();
 
@@ -47,7 +52,7 @@ public class Main {
       odometer.printPosition();
     });
     
-    Navigation.directTravelTo(waypoints.get(1));
+    Navigation.directTravelTo(firstPoint);
     Movement.stopMotors();
     
     odometer.printPositionInTileLengths();

@@ -76,10 +76,10 @@ public class AvoidObstacle {
    * @return decision going left or right
    */
   public static int decideLeftRight() { // TODO: Verify this decision with a 90 degree turn
-    turnUsMotor(-70);
+    turnUsMotor(-90);
     int distL = readUsDistance();
     
-    turnUsMotor(140);
+    turnUsMotor(180);
     int distR = readUsDistance();
     
     int decision;
@@ -91,7 +91,7 @@ public class AvoidObstacle {
       decision = RIGHT;
     }
     
-    turnUsMotor(-70);
+    turnUsMotor(-90);
     return decision;
   }
   

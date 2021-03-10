@@ -42,9 +42,9 @@ public class Navigation {
       travelToObstacle(destination);
       
       // case 4 : we have to turn and we know there won't be obstacles
-    } else if ((angleDiff >= 9.0 || angleDiff <= 351.0)
+    } else if ((angleDiff >= 5.0 || angleDiff <= 355.0)
         && (pathInGreenZone(startPoint, destination))) {
-      System.out.println("Destination has no obstacles ahead. Anglediff = "+angleDiff+" "+destTheta+" "+xyt[2]+".");
+      System.out.println("Destination has no obstacles ahead.");
       turnTo(destTheta);
       Movement.moveStraightFor(travelDist);
       
@@ -65,8 +65,7 @@ public class Navigation {
     }
     odometer.setX(toMeters(destination.x));
     odometer.setY(toMeters(destination.y));
-//    odometer.setTheta(getDestinationAngle(destTheta+90));
-//    odometer.setXyt(destination.x, destination.y, 0);
+    odometer.setTheta(getDestinationAngle(startPoint,destination)+90);
     pause();
   }
   
@@ -250,16 +249,9 @@ public class Navigation {
   
   
   
-  
-  
-  
-  
-  
-  
-  
   // TODO : REMOVE
   private static void pause() {
-    System.out.println("Pause");
+//    System.out.println("Pause");
     leftMotor.setSpeed(0);
     rightMotor.setSpeed(0);
     
