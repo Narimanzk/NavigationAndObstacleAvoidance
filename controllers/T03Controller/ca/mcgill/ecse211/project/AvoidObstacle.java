@@ -8,9 +8,9 @@ import simlejos.ExecutionController;
 
 public class AvoidObstacle {
   /** The ideal distance from left wall. */
-  public static final int WALL_DIST_LEFT = 13;
+  public static final int WALL_DIST_LEFT = 15;
   /** The ideal distance from right wall. */
-  public static final int WALL_DIST_RIGHT = 10;
+  public static final int WALL_DIST_RIGHT = 12;
   /** The maximum tolerated deviation from the ideal wall distance, aka the deadband, in cm. */
   public static final int WALL_DIST_ERR_THRESH = 0;
   /** Indicating left motor. */
@@ -20,7 +20,7 @@ public class AvoidObstacle {
   /** Speed of the faster rotating wheel (deg/sec). */
   public static final int MOTOR_HIGH = 300;
   /** Speed of slower rotating wheel (deg/sec). */
-  public static final int MOTOR_LOW = 80;
+  public static final int MOTOR_LOW = 100;
   
   /** The left and right motor speeds, respectively. */
   private static int[] motorSpeeds = new int[2];
@@ -214,12 +214,12 @@ public class AvoidObstacle {
       rightSpeed = MOTOR_HIGH;
       //When the sensor detects the robot is getting too close to the wall it goes away from wall
     } else if (distance_error > 0) {
-      rightSpeed = turningRight ? MOTOR_LOW :  MOTOR_HIGH + MOTOR_LOW;
-      leftSpeed = turningRight ? MOTOR_HIGH + MOTOR_LOW : MOTOR_LOW;
+      rightSpeed = turningRight ? MOTOR_LOW :  MOTOR_HIGH;
+      leftSpeed = turningRight ? MOTOR_HIGH : MOTOR_LOW;
       //When the sensor detects the robot is getting too far from the wall it goes towards the wall
     } else if (distance_error < 0) {
-      rightSpeed = turningRight ? MOTOR_HIGH + MOTOR_LOW : MOTOR_LOW;
-      leftSpeed = turningRight ? MOTOR_LOW : MOTOR_HIGH + MOTOR_LOW;
+      rightSpeed = turningRight ? MOTOR_HIGH : MOTOR_LOW;
+      leftSpeed = turningRight ? MOTOR_LOW : MOTOR_HIGH;
     }
     //Sets the speed of left and right motors
     motorSpeeds[LEFT] = leftSpeed;
