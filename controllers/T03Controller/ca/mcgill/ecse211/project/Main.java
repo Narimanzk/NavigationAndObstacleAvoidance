@@ -26,6 +26,7 @@ public class Main {
     ExecutionController.performPhysicsSteps(INITIAL_NUMBER_OF_PHYSICS_STEPS);
     ExecutionController.setNumberOfParties(NUMBER_OF_THREADS);
     ExecutionController.performPhysicsStepsInBackground(PHYSICS_STEP_PERIOD);
+    
     var startingPoint = waypoints.get(0);
     odometer.setXyt(startingPoint.x * TILE_SIZE, startingPoint.y * TILE_SIZE, 0);
     new Thread(odometer).start();
@@ -33,9 +34,11 @@ public class Main {
     UltrasonicLocalizer.localize();
     LightLocalizer.localize();
     System.out.println("Done localizing");
+    
+    odometer.setXyt(1 * TILE_SIZE, 7 * TILE_SIZE, 90);
+
     odometer.printPosition();
 
-    
     
     var remainingWaypoints = waypoints.subList(1, waypoints.size()); // other than starting point   
     remainingWaypoints.forEach(point -> {
